@@ -14,12 +14,11 @@ if (logSteps) {
 	});
 }
 
-async function init(caller_address, total_supply) {
-	const calldata = [{index: 0, value: new BN(total_supply), len: 32},];
-	const initialMemory = [], inputStack = [], callvalue = 0;
+async function init(caller_address) {
+	const initialMemory = [], inputStack = [], calldata = [], callvalue = 0;
 	const callerAddr = caller_address;
 	let data = await main(vm, 'ERC20', inputStack, initialMemory, calldata, callvalue, callerAddr);
-	console.log(`*** Initialised ERC20 with balance ${total_supply} at address 0x${caller_address.toString(16)}.`);
+	console.log(`*** Initialised ERC20 with tokens at address 0x${caller_address.toString(16)}.`);
 	if (showGasCost) {console.log(`Gas cost when executing macro = ${data.gas}.`);}
 }
 
@@ -93,19 +92,19 @@ async function transfer_from(caller_address, token_owner, recipient, amount) {
 /*
 Examples
 
-init(20, 1000); // Initialises ERC20 with 1000 tokens at address 20
-get_total_supply(); // Self-explanatory
+init(A); // Initialises ERC20 with all tokens at address A
+get_total_supply(); // Returns the number of tokens in circulation
 
-get_balance_of(20); // Gets balance at address 20
-transfer(20, 30, 100); // Transfers 100 tokens from 20 to 30
+get_balance_of(A); // Gets balance at address A
+transfer(A, B, 100); // Transfers 100 tokens from A to B
 
-get_allowance(20, 40); // Gets allowance given to 40 by 20
-approve(20, 40, 100); // Approves 100 of 20's tokens for 40
-transfer_from(20, 40, 50); // Transfers 50 of 20's tokens approved for 40 to 40
+get_allowance(A, C); // Gets allowance given to C by A
+approve(A, C, 100); // Approves 100 of A's tokens for C
+transfer_from(A, C, 50); // Transfers 50 of A's tokens approved for C to C
 */
 
 async function runMainLoop() {
-	await init(0xabba, 20000);
+	await init(0xabba);
 	await get_total_supply();
 
 	await transfer(0xabba, 0xade1e, 1000);
