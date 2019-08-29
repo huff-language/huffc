@@ -63,16 +63,16 @@ template <transfer, transfer_from, balance_of, allowance, approve, total_supply,
 	0x20
 	0x00
 	0x24 calldataload
-	// value 0x00 0x20 signature _from _to
+	// value 0x00 0x20 signature from to
 }
 
 #define macro ERC20__TRANSFER_GIVE_TO = takes(6) returns(7) {
-	// _value 0x00 0x20 signature _from _to
+	// value 0x00 0x20 signature from to
 	dup6 0x00 mstore
 	0x40 0x00 sha3
-	// key(balances[_to]) _value 0x00 0x20 signature _from _to
+	// key(balances[to]) value 0x00 0x20 signature from to
 	dup1 sload
-	// balances[_to] key _value 0x00 0x20 signature _from _to
+	// balances[to] key value 0x00 0x20 signature from to
 	dup3   // v b k v 0x00 0x20 sig f t
 	add    // v+b k v 0x00 0x20 sig f t
 	dup1   // v+b v+b k v 0x00 0x20 sig f t
@@ -84,17 +84,17 @@ template <transfer, transfer_from, balance_of, allowance, approve, total_supply,
 
 template <from>
 #define macro ERC20__TRANSFER_TAKE_FROM = takes(7) returns(8) {
-	// error_code _value 0x00 0x20 signature _from _to
+	// error_code value 0x00 0x20 signature from to
 	<from> 0x00 mstore
 	0x40 0x00 sha3
-	// key(balances[_from]) error_code _value 0x00 0x20 signature _from _to
-	dup1 sload // balances[_from] key error _value 0x00 0x20 sig f t
+	// key(balances[from]) error_code value 0x00 0x20 signature from to
+	dup1 sload // balances[from] key error value 0x00 0x20 sig f t
 			   // b k e1 v 0 2 s f t
 	dup4 dup2  // b v b k e1 v 0 2 s f t
 	sub dup5   // v (b-v) b k e1 v 0 2 s f t
 	swap3      // k (b-v) b v e1 v 0 2 s f t
 	sstore     // b v e1 v 0 2 s f t
-	lt         // error2 error1 _value 0x00 0x20 signature _from _to
+	lt         // error2 error1 value 0x00 0x20 signature from to
 }
 
 template <error_location>
@@ -102,39 +102,39 @@ template <error_location>
 	ERC20__TRANSFER_INIT()
 	ERC20__TRANSFER_GIVE_TO()
 	ERC20__TRANSFER_TAKE_FROM<caller>()
-	// error2 error1 _value 0x00 0x20 signature _from _to
+	// error2 error1 value 0x00 0x20 signature from to
 	callvalue or or <error_location> jumpi
-	// _value 0x00 0x20 signature _from _to
-	0x00 mstore // _value must be stored at 0x00
+	// value 0x00 0x20 signature from to
+	0x00 mstore // value must be stored at 0x00
 	log3
 	0x01 0x00 mstore
 	0x20 0x00 return
 }
 
 #define macro ERC20__TRANSFER_FROM_INIT = takes(0) returns(6) {
-	0x24 calldataload ADDRESS_MASK() // stack: _to
-	0x04 calldataload ADDRESS_MASK() // stack: _from _to
+	0x24 calldataload ADDRESS_MASK() // stack: to
+	0x04 calldataload ADDRESS_MASK() // stack: from to
 	TRANSFER_EVENT_SIGNATURE()
 	0x20
 	0x00
 	0x44 calldataload
-	// stacK: _value 0x00 0x20 signature _from _to
+	// stacK: value 0x00 0x20 signature from to
 }
 
 #define macro ERC20__TRANSFER_SUB_ALLOWANCE = takes(8) returns (9) {
-	// stack: error2 error1 _value 0x00 0x20 signature _from _to
+	// stack: error2 error1 value 0x00 0x20 signature from to
 	dup7 0x00 mstore
 	ALLOWANCE_LOCATION() 0x20 mstore
 	0x40 0x00 sha3
 	0x20 mstore
 	caller 0x00 mstore
 	0x40 0x00 sha3
-	// stack: key(allowances[_from][msg.sender]) error2 error1 _value 0x00 0x20 signature _from _to
+	// stack: key(allowances[from][msg.sender]) error2 error1 value 0x00 0x20 signature from to
 	dup1 sload // allowance key e2 e1 v 0x00 0x20 s f t
 	dup5 dup2 // a v a k e2 e1 v 0 2 s f t
 	sub dup6 // v a-v a k e2 e1 v 0 2 s f t
 	swap3 sstore // a v e2 e1 v 0 2 s f t
-	lt // stack: error3 error2 error1 _value 0x00 0x20 signature _from _to
+	lt // stack: error3 error2 error1 value 0x00 0x20 signature from to
 }
 
 template <error_location>
@@ -143,9 +143,9 @@ template <error_location>
 	ERC20__TRANSFER_GIVE_TO()
 	ERC20__TRANSFER_TAKE_FROM<dup6>()
 	ERC20__TRANSFER_SUB_ALLOWANCE()
-	// error3 error2 error1 _value 0x00 0x20 signature _from _to
+	// error3 error2 error1 value 0x00 0x20 signature from to
 	callvalue or or or <error_location> jumpi
-	// _value 0x00 0x20 signature _from _to
+	// value 0x00 0x20 signature from to
 	0x00 mstore
 	log3
 	0x01 0x00 mstore
@@ -157,8 +157,8 @@ template <error_location>
 	UTILS__NOT_PAYABLE<error_location>()
 	0x04 calldataload ADDRESS_MASK()
 	0x00 mstore
-	0x40 0x00 sha3 // stacK: key(balances[_owner])
-	sload // stack: balances[_owner]
+	0x40 0x00 sha3 // stacK: key(balances[owner])
+	sload // stack: balances[owner]
 	0x00 mstore
 	0x20 0x00 return
 }
@@ -170,12 +170,12 @@ template <error_location>
 	0x00 mstore
 	ALLOWANCE_LOCATION() 0x20 mstore
 	0x40 0x00 sha3
-	// stack: key(allowances[_owner])
+	// stack: key(allowances[owner])
 	0x20 mstore
 	0x24 calldataload ADDRESS_MASK()
 	0x00 mstore
 	0x40 0x00 sha3
-	// stack: key(allowances[_owner][_spender])
+	// stack: key(allowances[owner][spender])
 	sload
 	0x00 mstore
 	0x20 0x00 return
@@ -189,20 +189,20 @@ template <error_location>
 	APPROVAL_EVENT_SIGNATURE()
 	0x20
 	0x00
-	// stack: 0x00 0x20 signature msg.sender _spender
-	0x24 calldataload // get _value
+	// stack: 0x00 0x20 signature msg.sender spender
+	0x24 calldataload // get value
 	dup1
-	// stack: _value _value 0x00 0x20 signature msg.sender _spender
+	// stack: value value 0x00 0x20 signature msg.sender spender
 	caller 0x00 mstore
 	ALLOWANCE_LOCATION() 0x20 mstore
 	0x40 0x00 sha3
 	0x20 mstore
 	dup7 0x00 mstore
 	0x40 0x00 sha3
-	// stack: key(allowances[msg.sender][spender]) _value _value 0x00 0x20 signature msg.sender _spender
+	// stack: key(allowances[msg.sender][spender]) value value 0x00 0x20 signature msg.sender spender
 	sstore
 	0x00 mstore
-	// stack: 0x00 0x20 signature msg.sender _spender
+	// stack: 0x00 0x20 signature msg.sender spender
 	log3
 	0x01 0x00 mstore
 	0x20 0x00 return
@@ -222,14 +222,14 @@ template <error_location>
 	0x04 calldataload ADDRESS_MASK()
 	0 TRANSFER_EVENT_SIGNATURE() 0x20 0x00
 	0x24 calldataload
-	// stack: _value 0x00 0x20 signature _from _to
+	// stack: value 0x00 0x20 signature from to
 	ERC20__TRANSFER_GIVE_TO()
-	// stack: error1 _value 0x00 0x20 signature _from _to
+	// stack: error1 value 0x00 0x20 signature from to
 	dup2 dup1
-	// stack: _value _value 0x00 0x20 signature _from _to
+	// stack: value value 0x00 0x20 signature from to
 	TOTAL_SUPPLY_LOCATION() sload add dup1 TOTAL_SUPPLY_LOCATION() sstore
 	lt
-	// stack: error2 error1 0x00 0x20 signature _from _to
+	// stack: error2 error1 0x00 0x20 signature from to
 	callvalue or or <error_location> jumpi
 	log3
 	0x01 0x00 mstore
