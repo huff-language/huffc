@@ -51,7 +51,7 @@ describe('parser tests', () => {
                 },
             };
             const result = utils.normalize(
-                new BN('1e2a2', 16).add(new BN('1234', 16).sub(new BN(222, 10).mul(new BN('12345', 16)))),
+                new BN('1e2a2', 16).add(new BN('1234', 16).sub(new BN(222, 10).mul(new BN('12345', 16))))
             );
             expect(parser.processTemplateLiteral(source, macros).toString(16)).to.equal(result.toString(16));
         });
@@ -82,7 +82,7 @@ describe('parser tests', () => {
                 },
             };
             const numericResult = utils.normalize(
-                new BN('1e2a2', 16).add(new BN('1234', 16).sub(new BN(222, 10).mul(new BN('12345', 16)))),
+                new BN('1e2a2', 16).add(new BN('1234', 16).sub(new BN(222, 10).mul(new BN('12345', 16))))
             );
             result = parser.parseTemplate(source, macros, 0);
             expect(result.macros['inline-FOO+0x1234-222*BAR-stub']).to.deep.equal({

@@ -89,7 +89,7 @@ function runCode(vm, bytecode, calldata, sourcemapOffset = 0, sourcemap = [], ca
                     return reject(err);
                 }
                 return resolve(results);
-            },
+            }
         );
     });
 }

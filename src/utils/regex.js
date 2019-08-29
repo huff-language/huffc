@@ -7,7 +7,7 @@ const operators = new RegExp('[\\+\\-\\*]');
 // const angleBrackets = new RegExp('^[^<>]*');
 
 regex.sliceCommas = (input) => {
-    return (input.match(commas) || []).filter((r) => r !== '');
+    return (input.match(commas) || []).filter(r => r !== '');
 };
 
 regex.endOfData = (input) => {

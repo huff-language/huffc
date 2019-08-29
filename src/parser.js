@@ -6,7 +6,9 @@ const fs = require('fs');
 const grammar = require('./grammar/grammar');
 const inputMaps = require('./inputMap/inputMap');
 const regex = require('./utils/regex');
-const { formatEvenBytes, toHex, padNBytes, normalize } = require('./utils');
+const {
+    formatEvenBytes, toHex, padNBytes, normalize,
+} = require('./utils');
 
 const { opcodes } = require('./opcodes/opcodes');
 
@@ -54,7 +56,7 @@ parser.processMacroLiteral = (op, macros) => {
     if (macros[op]) {
         check(
             macros[op].ops.length === 1 && macros[op].ops[0].type === TYPES.PUSH,
-            `cannot add ${op}, ${macros[op].ops} not a literal`,
+            `cannot add ${op}, ${macros[op].ops} not a literal`
         );
         return new BN(macros[op].ops[0].args[0], 16);
     }
@@ -78,7 +80,7 @@ parser.processTemplateLiteral = (literal, macros) => {
                         return val;
                     }
                     return acc.sub(val);
-                }, null),
+                }, null)
         );
     }
     if (literal.includes('+')) {
@@ -97,7 +99,7 @@ parser.processTemplateLiteral = (literal, macros) => {
                         return val;
                     }
                     return acc.add(val);
-                }, null),
+                }, null)
         );
     }
     if (literal.includes('*')) {
@@ -116,7 +118,7 @@ parser.processTemplateLiteral = (literal, macros) => {
                         return val;
                     }
                     return acc.mul(val);
-                }, null),
+                }, null)
         );
     }
     return parser.processMacroLiteral(literal, macros);
@@ -199,7 +201,7 @@ parser.processMacro = (
     templateArgumentsRaw = [],
     startingMacros = {},
     map = {},
-    jumptables = {},
+    jumptables = {}
 ) => {
     const result = parser.processMacroInternal(name, startingBytecodeIndex, templateArgumentsRaw, startingMacros, map);
     if (result.unmatchedJumps.length > 0) {
@@ -265,7 +267,7 @@ parser.processMacroInternal = (
     startingMacros = {},
     map = {},
     jumpindicesInitial = {},
-    tableInstancesInitial = [],
+    tableInstancesInitial = []
 ) => {
     let macros = startingMacros;
     const macro = macros[name];
@@ -393,7 +395,7 @@ parser.processMacroInternal = (
                         if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== 'xxxx') {
                             throw new Error(
                                 `expected indicies ${bytecodeIndex + 2} to ${bytecodeIndex + 6} to be jump location, of
-                            ${formattedBytecode}`,
+                            ${formattedBytecode}`
                             );
                         }
                         formattedBytecode = `${pre}${jumpvalue}${post}`;
@@ -412,7 +414,7 @@ parser.processMacroInternal = (
         {
             bytecode: '',
             sourcemap: [],
-        },
+        }
     );
 
     return {
