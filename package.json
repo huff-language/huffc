@@ -39,7 +39,8 @@
     "url": "git+https://github.com/AztecProtocol/AZTEC.git"
   },
   "scripts": {
-    "lint": "eslint --ignore-path ../../.eslintignore .",
-    "test": "mocha ./src/ --bail --colors --exit --recursive --reporter spec --trace-warnings"
+    "lint": "eslint --ignore-path ./.eslintignore .",
+    "test": "mocha ./src/ --bail --colors --exit --recursive --reporter spec --trace-warnings",
+    "exampletest": "mocha ./example/ --bail --colors --exit --recursive --reporter spec --trace-warnings"
   }
 }

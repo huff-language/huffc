@@ -14,7 +14,7 @@ inputMap.createInputMap = (fileData) => {
                 startingIndices: [...accumulator.startingIndices, oldIndex],
             };
         },
-        { files: [], startingIndices: [] },
+        { files: [], startingIndices: [] }
     );
 };
 
