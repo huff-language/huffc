@@ -178,3 +178,8 @@ console.log('macro return data = ', returnData);
 console.log('output stack state = ', stack);
 console.log('output memory state = ', memory);
 ```
+
+## Testing
+
+Tests can be run with `yarn test`. Example contracts, such as the ERC20 implementation, can be tested with `yarn exampletest`.
+
