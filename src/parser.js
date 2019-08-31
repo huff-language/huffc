@@ -227,8 +227,9 @@ parser.processMacro = (
                     const hex = formatEvenBytes(toHex(offset));
                     if (!jumptable.table.compressed) {
                         return padNBytes(hex, 0x20);
+                    } else {
+                        return padNBytes(hex, 0x02);
                     }
-                    return hex;
                 })
                 .join('');
         } else {
