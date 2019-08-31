@@ -215,6 +215,33 @@ describe('parser tests', () => {
         });
     });
 
+    describe('process packed jump table', () => {
+        const source = `#define jumptable__packed JUMP_TABLE {
+            lsb_0
+        }
+        
+        #define macro PACKED_TABLE_TEST = takes(0) returns(0) {
+            __tablesize(JUMP_TABLE) __tablestart(JUMP_TABLE)
+            lsb_0:
+        }`
+        it(`processMacro will ensure packed jump table labels are 2 bytes`, () => {
+            const map = inputMap.createInputMap([
+                {
+                    filename: 'test',
+                    data: source,
+                },
+            ]);
+            const { macros, jumptables } = parser.parseTopLevel(source, 0, map);
+            const { JUMP_TABLE: { table: { jumps, size,  compressed } } } = jumptables;
+            expect(compressed).to.be.true;
+            expect(jumps).to.deep.equal(['lsb_0'])
+            const output = parser.processMacro('PACKED_TABLE_TEST', 0, [], macros, map, jumptables);
+            const { jumpindices, bytecode } = output.data;
+            expect(jumpindices.lsb_0).to.equal(5);
+            expect(bytecode).to.equal('60026100065b0005');
+        })
+    });
+
     describe('parse top level', () => {
         let parseMacro;
         beforeEach(() => {
