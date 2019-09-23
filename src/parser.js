@@ -244,21 +244,12 @@ parser.processMacro = (
             throw new Error(`expected to find ${tableInstance.label} in ${JSON.stringify(tableOffsets)}`);
         }
         const { offset } = tableInstance;
-<<<<<<< HEAD
-        const placeholder = bytecode.slice((offset * 2) + 2, (offset * 2) + 6);
-        if (placeholder !== 'xxxx') {
-            throw new Error(`expected ${placeholder} to be xxxx at offset ${tableInstance.offset}`);
-        }
-        const pre = bytecode.slice(0, (offset * 2) + 2);
-        const post = bytecode.slice((offset * 2) + 6);
-=======
         const placeholder = bytecode.slice(offset * 2 + 2, offset * 2 + 6);
         if (placeholder !== 'xxxx') {
             throw new Error(`expected ${placeholder} to be xxxx at offset ${tableInstance.offset}`);
         }
         const pre = bytecode.slice(0, offset * 2 + 2);
         const post = bytecode.slice(offset * 2 + 6);
->>>>>>> upstream/master
         bytecode = `${pre}${padNBytes(formatEvenBytes(toHex(tableOffsets[tableInstance.label])), 2)}${post}`;
     });
     return {
