@@ -750,4 +750,53 @@ parser.compileMacro = (macroName, filename, partialPath) => {
     return { bytecode, sourcemap };
 };
 
+parser.getSourcesFileContents = (sources, entryFile) => {
+    const included = {};
+    const parentPathOf = (str) => (m = /(.*)\/(?!\/)(.*)\.huff/g.exec(str)) && m[1];
+    const recurse = (filename, parentPath) => {
+        const relativePath = path.join(parentPath || '', filename);
+        const fileString = sources[relativePath];
+        let formatted = parser.removeComments(fileString);
+        let imported = [];
+        let test = formatted.match(grammar.topLevel.IMPORT);
+        while (test !== null) {
+            const importStatement = formatted.match(grammar.topLevel.IMPORT);
+            const empty = ' '.repeat(importStatement[0].length);
+            formatted = empty + formatted.slice(importStatement[0].length);
+            const importedFilename = importStatement[1];
+            if (!included[importedFilename]) {
+                imported = [...imported, ...recurse(importedFilename, parentPathOf(relativePath))];
+                included[importedFilename] = true;
+            }
+            test = formatted.match(grammar.topLevel.IMPORT);
+        }
+        const result = [
+            ...imported,
+            {
+                filename: path.join('', filename),
+                data: formatted,
+            },
+        ];
+        return result;
+    };
+    const filedata = recurse(entryFile);
+    const raw = filedata.reduce((acc, { data }) => {
+        return acc + data;
+    }, '');
+    return { filedata, raw };
+};
+
+/** 
+ * @param source - can be either a filename or a sources object
+ * @param _path - if a sources object is given, path should be the entry file; otherwise, path should be the parent path
+*/
+parser.parse = (source, _path) => {
+    const { filedata, raw } = (typeof source == 'string')
+        ? parser.getFileContents(source, _path)
+        : parser.getSourcesFileContents(source, _path)
+    const map = inputMaps.createInputMap(filedata);
+    const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
+    return { inputMap: map, macros, jumptables };
+};
+
 module.exports = parser;
