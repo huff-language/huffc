@@ -1,36 +1,46 @@
 {
-  "name": "huff",
-  "version": "0.1.0",
-  "description": "Compiler for Huff - a DSL for low-level Ethereum smart contract programming",
-  "main": "parser.js",
-  "scripts": {
-    "test": "mocha ./src/ --trace-warnings --exit --colors --recursive --reporter spec",
-    "testCoverage": "nyc mocha ./src/ --trace-warnings --exit --colors --recursive --reporter spec"
+  "name": "@aztec/huff",
+  "description": "Compiler for Huff, a DSL for low-level Ethereum smart contract programming",
+  "version": "0.0.1",
+  "author": "AZTEC",
+  "bugs": {
+    "url": "https://github.com/AztecProtocol/huff/issues"
   },
+  "dependencies": {
+    "bn.js": "^4.11.8",
+    "ethereumjs-vm": "^2.5.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "fixpack": "^2.3.1",
+    "mocha": "^6.0.2",
+    "sinon": "^7.2.3"
+  },
+  "engines": {
+    "node": ">=8.3"
+  },
+  "homepage": "https://github.com/AztecProtocol/huff/tree/master/#readme",
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "evm",
+    "huff",
+    "programming-language",
+    "smart-contracts"
+  ],
+  "license": "LGPL-3.0",
+  "main": "./src",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AztecProtocol/huff.git"
   },
-  "keywords": [
-    "huff",
-    "evm",
-    "smart",
-    "contract"
-  ],
-  "author": "AZTEC",
-  "license": "LGPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/AztecProtocol/huff/issues"
-  },
-  "homepage": "https://github.com/AztecProtocol/huff#readme",
-  "dependencies": {
-    "bn.js": "^4.11.8",
-    "ethereumjs-vm": "^2.5.1",
-    "nyc": "^13.1.0"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "sinon": "^7.2.3"
+  "scripts": {
+    "lint": "eslint --ignore-path ./.eslintignore .",
+    "test": "mocha ./src/ --bail --colors --exit --recursive --reporter spec --trace-warnings",
+    "exampletest": "mocha ./example/ --bail --colors --exit --recursive --reporter spec --trace-warnings"
   }
 }
