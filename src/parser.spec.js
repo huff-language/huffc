@@ -306,6 +306,12 @@ describe('parser tests', () => {
             expect(result.sourcemap.length).to.equal(result.bytecode.length / 2);
         });
 
+        it(`can compile macro in sources object`, () => {
+            const sources = require(path.join(pathToTestData, 'sources.json'))
+            const result = parser.compileMacro('ADD_ONE', sources, 'd.huff');
+            expect(result.bytecode).to.equal('600101')
+        })
+
         it('frozen version of MAIN_TWO_ENDO_MOD macro is correctly compiled', () => {
             const result = parser.compileMacro('MAIN_TWO_ENDO_MOD', './main_loop.huff', pathToTestData);
             const expected = fs.readFileSync(path.posix.resolve(pathToTestData, 'compiled.txt'), 'utf8');
