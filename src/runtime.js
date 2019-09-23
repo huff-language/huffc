@@ -95,7 +95,7 @@ function runCode(vm, bytecode, calldata, sourcemapOffset = 0, sourcemap = [], ca
 }
 
 function Runtime(filename, path, debug = false) {
-    const { inputMap, macros, jumptables } = newParser.parseFile(filename, path);
+    const { inputMap, macros, jumptables } = newParser.parse(filename, path);
     return async function runMacro(vm, macroName, stack = [], memory = [], calldata = null, callvalue = 0, callerAddr = 0) {
         const memoryCode = encodeMemory(memory);
         const stackCode = encodeStack(stack);

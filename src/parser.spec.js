@@ -12,6 +12,7 @@ const { opcodes } = require('./opcodes/opcodes');
 const { expect } = chai;
 
 const pathToTestData = path.posix.resolve(__dirname, '../testData');
+const sources = require(path.join(pathToTestData, 'sources.json'));
 
 describe('parser tests', () => {
     describe('templates', () => {
@@ -307,9 +308,13 @@ describe('parser tests', () => {
         });
 
         it(`can compile macro in sources object`, () => {
-            const sources = require(path.join(pathToTestData, 'sources.json'))
-            const result = parser.compileMacro('ADD_ONE', sources, 'd.huff');
+            const result = parser.compileMacro('ADD_ONE', sources, 'test.huff');
             expect(result.bytecode).to.equal('600101')
+        })
+
+        it('can load file missing from sources object', () => {
+            const result = parser.compileMacro('ADD_THREE', sources, 'testData/external.huff');
+            expect(result.bytecode).to.equal('600301')
         })
 
         it('frozen version of MAIN_TWO_ENDO_MOD macro is correctly compiled', () => {

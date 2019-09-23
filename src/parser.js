@@ -734,28 +734,21 @@ parser.getFileContents = (originalFilename, partialPath) => {
     return { filedata, raw };
 };
 
-parser.parseFile = (filename, partialPath) => {
-    const { filedata, raw } = parser.getFileContents(filename, partialPath);
-    const map = inputMaps.createInputMap(filedata);
-    const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
-    return { inputMap: map, macros, jumptables };
-};
-
-parser.compileMacro = (macroName, filename, partialPath) => {
-    const { filedata, raw } = parser.getFileContents(filename, partialPath);
-    const map = inputMaps.createInputMap(filedata);
-    const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
-    const { data: { bytecode, sourcemap } } = parser.processMacro(macroName, 0, [], macros, map, jumptables); // prettier-ignore
-
-    return { bytecode, sourcemap };
-};
-
+const normalizePath = (str) => path.join('', str);
 parser.getSourcesFileContents = (sources, entryFile) => {
     const included = {};
     const parentPathOf = (str) => (m = /(.*)\/(?!\/)(.*)\.huff/g.exec(str)) && m[1];
     const recurse = (filename, parentPath) => {
-        const relativePath = path.join(parentPath || '', filename);
-        const fileString = sources[relativePath];
+        const fileName = normalizePath(filename)
+        const relativePath = path.join(parentPath || '', fileName);
+        let fileString = sources[relativePath];
+        if (!fileString) {
+            if (!fs.existsSync(relativePath)) {
+                throw new Error(`Import not found: ${fileName} ${(parentPath && parentPath !== '.') ? `in ${parentPath}` : ''}`)
+            }
+            fileString = fs.readFileSync(relativePath, 'utf8');
+            console.log(`Warning: File ${relativePath} does not exist in sources, found in filesystem.`)
+        }
         let formatted = parser.removeComments(fileString);
         let imported = [];
         let test = formatted.match(grammar.topLevel.IMPORT);
@@ -773,7 +766,7 @@ parser.getSourcesFileContents = (sources, entryFile) => {
         const result = [
             ...imported,
             {
-                filename: path.join('', filename),
+                filename: fileName,
                 data: formatted,
             },
         ];
@@ -786,14 +779,39 @@ parser.getSourcesFileContents = (sources, entryFile) => {
     return { filedata, raw };
 };
 
+parser.getContents = (source, _path) => {
+    if (typeof source == 'string') {
+        return parser.getFileContents(source, _path);
+    } else {
+        const sources = Object.keys(source).reduce((obj, key) => ({
+            ...obj,
+            [normalizePath(key)]: source[key]
+        }), {});
+        return parser.getSourcesFileContents(sources, _path)
+    }
+}
+
+parser.parseFile = (filename, partialPath) => {
+    const { filedata, raw } = parser.getFileContents(filename, partialPath);
+    const map = inputMaps.createInputMap(filedata);
+    const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
+    return { inputMap: map, macros, jumptables };
+};
+
+parser.compileMacro = (macroName, source, _path) => {
+    const { filedata, raw } = parser.getContents(source, _path)
+    const map = inputMaps.createInputMap(filedata);
+    const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
+    const { data: { bytecode, sourcemap } } = parser.processMacro(macroName, 0, [], macros, map, jumptables); // prettier-ignore
+    return { bytecode, sourcemap };
+};
+
 /** 
  * @param source - can be either a filename or a sources object
  * @param _path - if a sources object is given, path should be the entry file; otherwise, path should be the parent path
 */
 parser.parse = (source, _path) => {
-    const { filedata, raw } = (typeof source == 'string')
-        ? parser.getFileContents(source, _path)
-        : parser.getSourcesFileContents(source, _path)
+    const { filedata, raw } = parser.getContents(source, _path)
     const map = inputMaps.createInputMap(filedata);
     const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
     return { inputMap: map, macros, jumptables };
