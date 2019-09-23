@@ -782,14 +782,13 @@ parser.getSourcesFileContents = (sources, entryFile) => {
 parser.getContents = (source, _path) => {
     if (typeof source == 'string') {
         return parser.getFileContents(source, _path);
-    } else {
-        const sources = Object.keys(source).reduce((obj, key) => ({
-            ...obj,
-            [normalizePath(key)]: source[key]
-        }), {});
-        return parser.getSourcesFileContents(sources, _path)
     }
-}
+    const sources = Object.keys(source).reduce((obj, key) => ({
+        ...obj,
+        [normalizePath(key)]: source[key],
+    }), {});
+    return parser.getSourcesFileContents(sources, _path);
+};
 
 parser.parseFile = (filename, partialPath) => {
     const { filedata, raw } = parser.getFileContents(filename, partialPath);
