@@ -17,11 +17,7 @@ function Compiler(projectName, projectPath) {
 
     const settings = JSON.parse(settingsString);
     const {
-        abi,
-        name,
-        file: entryFilename,
-        entryMacro,
-        constructor,
+        abi, name, file: entryFilename, entryMacro, constructor,
     } = settings;
     if (!entryMacro || !constructor || !entryFilename) {
         throw new Error(`could not find ${entryMacro}, ${constructor}, ${entryFilename}`);
