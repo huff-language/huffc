@@ -40,6 +40,25 @@ describe('parser tests', () => {
             expect(parser.processMacroLiteral(source, macros).toString(16)).to.equal(new BN('1e2a2', 16).toString(16));
         });
 
+        it('processMacroLiteral will process a __codesize macro', () => {
+            const macros = {
+                FOO: {
+                    templateParams: [],
+                    name: 'FOO',
+                    ops: [{ type: 'PUSH', value: '62', args: ['01e2a2'] }],
+                },
+                FOO_SIZE: {
+                    templateParams: [],
+                    name: 'FOO_SIZE',
+                    ops: [{ type: 'CODESIZE', value: 'FOO', args: [] }],
+                },
+            };
+            const source = 'FOO_SIZE';
+            const map = { files: [{ data: '' }], startingIndices: [0] };
+            const result = parser.processMacroLiteral(source, macros, map);
+            expect(result.toString(16)).to.equal(new BN(4).toString(16));
+        });
+
         it('processTemplateLiteral will convert template literals to BN form', () => {
             const source = 'FOO+0x1234-222*BAR';
             const macros = {
