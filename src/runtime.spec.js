@@ -69,7 +69,7 @@ describe('runtime tests using double algorithm', () => {
 const sources = {
     'test.huff': testHelper,
     'double.huff': fs.readFileSync(path.join(pathToTestData, 'double.huff'), 'utf8'),
-    'constants.huff': fs.readFileSync(path.join(pathToTestData, 'constants.huff'), 'utf8')
+    'constants.huff': fs.readFileSync(path.join(pathToTestData, 'constants.huff'), 'utf8'),
 };
 
 describe('sources object', () => {

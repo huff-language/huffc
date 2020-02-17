@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-bitwise */
 const BN = require('bn.js');
 const path = require('path');
@@ -46,7 +47,7 @@ parser.substituteTemplateArguments = (newTemplateArguments, templateRegExps) => 
     }, []);
 };
 
-parser.processMacroLiteral = (op, macros) => {
+parser.processMacroLiteral = (op, macros, map) => {
     if (op.match(grammar.macro.LITERAL_HEX)) {
         return new BN(op.match(grammar.macro.LITERAL_HEX)[1], 16);
     }
@@ -55,15 +56,36 @@ parser.processMacroLiteral = (op, macros) => {
     }
     if (macros[op]) {
         check(
-            macros[op].ops.length === 1 && macros[op].ops[0].type === TYPES.PUSH,
-            `cannot add ${op}, ${macros[op].ops} not a literal`
+            macros[op].ops.length === 1,
+            `cannot add ${op}, contains more than 1 operation`
         );
-        return new BN(macros[op].ops[0].args[0], 16);
+
+        const literal = macros[op].ops[0];
+        switch (literal.type) {
+            case TYPES.PUSH: {
+                return new BN(macros[op].ops[0].args[0], 16);
+            }
+            case TYPES.CODESIZE: {
+                const result = parser.processMacroInternal(
+                    literal.value,
+                    literal.index,
+                    literal.args,
+                    macros,
+                    map,
+                    {},
+                    []
+                );
+                return new BN(formatEvenBytes(result.data.bytecode.length / 2));
+            }
+            default: {
+                throw new Error(`cannot add ${op}, ${macros[op].ops} not a literal`);
+            }
+        }
     }
     throw new Error(`I don't know how to process literal ${op}`);
 };
 
-parser.processTemplateLiteral = (literal, macros) => {
+parser.processTemplateLiteral = (literal, macros, map) => {
     if (literal.includes('-')) {
         return normalize(
             literal
@@ -71,9 +93,9 @@ parser.processTemplateLiteral = (literal, macros) => {
                 .map((rawOp) => {
                     const op = regex.removeSpacesAndLines(rawOp);
                     if (regex.containsOperators(op)) {
-                        return parser.processTemplateLiteral(op, macros);
+                        return parser.processTemplateLiteral(op, macros, map);
                     }
-                    return parser.processMacroLiteral(op, macros);
+                    return parser.processMacroLiteral(op, macros, map);
                 })
                 .reduce((acc, val) => {
                     if (!acc) {
@@ -90,9 +112,9 @@ parser.processTemplateLiteral = (literal, macros) => {
                 .map((rawOp) => {
                     const op = regex.removeSpacesAndLines(rawOp);
                     if (regex.containsOperators(op)) {
-                        return parser.processTemplateLiteral(op, macros);
+                        return parser.processTemplateLiteral(op, macros, map);
                     }
-                    return parser.processMacroLiteral(op, macros);
+                    return parser.processMacroLiteral(op, macros, map);
                 })
                 .reduce((acc, val) => {
                     if (!acc) {
@@ -109,9 +131,9 @@ parser.processTemplateLiteral = (literal, macros) => {
                 .map((rawOp) => {
                     const op = regex.removeSpacesAndLines(rawOp);
                     if (regex.containsOperators(op)) {
-                        return parser.processTemplateLiteral(op, macros);
+                        return parser.processTemplateLiteral(op, macros, map);
                     }
-                    return parser.processMacroLiteral(op, macros);
+                    return parser.processMacroLiteral(op, macros, map);
                 })
                 .reduce((acc, val) => {
                     if (!acc) {
@@ -121,13 +143,13 @@ parser.processTemplateLiteral = (literal, macros) => {
                 }, null)
         );
     }
-    return parser.processMacroLiteral(literal, macros);
+    return parser.processMacroLiteral(literal, macros, map);
 };
 
-parser.parseTemplate = (templateName, macros = {}, index = 0) => {
+parser.parseTemplate = (templateName, macros = {}, map = {}, index = 0) => {
     const macroId = parser.getId();
     if (regex.isLiteral(templateName)) {
-        const hex = formatEvenBytes(parser.processTemplateLiteral(templateName, macros).toString(16));
+        const hex = formatEvenBytes(parser.processTemplateLiteral(templateName, macros, map).toString(16));
         const opcode = toHex(95 + hex.length / 2);
         return {
             templateName: `inline-${templateName}-${macroId}`,
@@ -227,9 +249,8 @@ parser.processMacro = (
                     const hex = formatEvenBytes(toHex(offset));
                     if (!jumptable.table.compressed) {
                         return padNBytes(hex, 0x20);
-                    } else {
-                        return padNBytes(hex, 0x02);
                     }
+                    return padNBytes(hex, 0x02);
                 })
                 .join('');
         } else {
@@ -303,7 +324,7 @@ parser.processMacroInternal = (
                 check(index !== -1, `cannot find template ${op.value}`);
                 // what is this template? It's either a macro or a template argument;
                 let templateName = templateArguments[macroNameIndex];
-                ({ macros, templateName } = parser.parseTemplate(templateName, macros, index));
+                ({ macros, templateName } = parser.parseTemplate(templateName, macros, map, index));
                 const result = parser.processMacroInternal(templateName, offset, [], macros, map, jumpindicesInitial, []);
                 tableInstances = [...tableInstances, ...result.tableInstances];
                 jumptable[index] = result.unmatchedJumps;
@@ -734,20 +755,21 @@ parser.getFileContents = (originalFilename, partialPath) => {
     return { filedata, raw };
 };
 
-const normalizePath = (str) => path.join('', str);
+const normalizePath = str => path.join('', str);
 parser.getSourcesFileContents = (sources, entryFile) => {
     const included = {};
-    const parentPathOf = (str) => (m = /(.*)\/(?!\/)(.*)\.huff/g.exec(str)) && m[1];
+    // eslint-disable-next-line no-undef
+    const parentPathOf = str => (m = /(.*)\/(?!\/)(.*)\.huff/g.exec(str)) && m[1];
     const recurse = (filename, parentPath) => {
-        const fileName = normalizePath(filename)
+        const fileName = normalizePath(filename);
         const relativePath = path.join(parentPath || '', fileName);
         let fileString = sources[relativePath];
         if (!fileString) {
             if (!fs.existsSync(relativePath)) {
-                throw new Error(`Import not found: ${fileName} ${(parentPath && parentPath !== '.') ? `in ${parentPath}` : ''}`)
+                throw new Error(`Import not found: ${fileName} ${(parentPath && parentPath !== '.') ? `in ${parentPath}` : ''}`);
             }
             fileString = fs.readFileSync(relativePath, 'utf8');
-            console.log(`Warning: File ${relativePath} does not exist in sources, found in filesystem.`)
+            console.log(`Warning: File ${relativePath} does not exist in sources, found in filesystem.`);
         }
         let formatted = parser.removeComments(fileString);
         let imported = [];
@@ -780,7 +802,7 @@ parser.getSourcesFileContents = (sources, entryFile) => {
 };
 
 parser.getContents = (source, _path) => {
-    if (typeof source == 'string') {
+    if (typeof source === 'string') {
         return parser.getFileContents(source, _path);
     }
     const sources = Object.keys(source).reduce((obj, key) => ({
@@ -798,19 +820,19 @@ parser.parseFile = (filename, partialPath) => {
 };
 
 parser.compileMacro = (macroName, source, _path) => {
-    const { filedata, raw } = parser.getContents(source, _path)
+    const { filedata, raw } = parser.getContents(source, _path);
     const map = inputMaps.createInputMap(filedata);
     const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
     const { data: { bytecode, sourcemap } } = parser.processMacro(macroName, 0, [], macros, map, jumptables); // prettier-ignore
     return { bytecode, sourcemap };
 };
 
-/** 
+/**
  * @param source - can be either a filename or a sources object
  * @param _path - if a sources object is given, path should be the entry file; otherwise, path should be the parent path
 */
 parser.parse = (source, _path) => {
-    const { filedata, raw } = parser.getContents(source, _path)
+    const { filedata, raw } = parser.getContents(source, _path);
     const map = inputMaps.createInputMap(filedata);
     const { macros, jumptables } = parser.parseTopLevel(raw, 0, map);
     return { inputMap: map, macros, jumptables };

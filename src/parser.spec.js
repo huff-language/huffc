@@ -12,6 +12,7 @@ const { opcodes } = require('./opcodes/opcodes');
 const { expect } = chai;
 
 const pathToTestData = path.posix.resolve(__dirname, '../testData');
+// eslint-disable-next-line import/no-dynamic-require
 const sources = require(path.join(pathToTestData, 'sources.json'));
 
 describe('parser tests', () => {
@@ -39,6 +40,25 @@ describe('parser tests', () => {
             };
             source = 'FOO';
             expect(parser.processMacroLiteral(source, macros).toString(16)).to.equal(new BN('1e2a2', 16).toString(16));
+        });
+
+        it('processMacroLiteral will process a __codesize macro', () => {
+            const macros = {
+                FOO: {
+                    templateParams: [],
+                    name: 'FOO',
+                    ops: [{ type: 'PUSH', value: '62', args: ['01e2a2'] }],
+                },
+                FOO_SIZE: {
+                    templateParams: [],
+                    name: 'FOO_SIZE',
+                    ops: [{ type: 'CODESIZE', value: 'FOO', args: [] }],
+                },
+            };
+            const source = 'FOO_SIZE';
+            const map = { files: [{ data: '' }], startingIndices: [0] };
+            const result = parser.processMacroLiteral(source, macros, map);
+            expect(result.toString(16)).to.equal(new BN(4).toString(16));
         });
 
         it('processTemplateLiteral will convert template literals to BN form', () => {
@@ -220,12 +240,12 @@ describe('parser tests', () => {
         const source = `#define jumptable__packed JUMP_TABLE {
             lsb_0
         }
-        
+
         #define macro PACKED_TABLE_TEST = takes(0) returns(0) {
             __tablesize(JUMP_TABLE) __tablestart(JUMP_TABLE)
             lsb_0:
-        }`
-        it(`processMacro will ensure packed jump table labels are 2 bytes`, () => {
+        }`;
+        it('processMacro will ensure packed jump table labels are 2 bytes', () => {
             const map = inputMap.createInputMap([
                 {
                     filename: 'test',
@@ -233,14 +253,15 @@ describe('parser tests', () => {
                 },
             ]);
             const { macros, jumptables } = parser.parseTopLevel(source, 0, map);
-            const { JUMP_TABLE: { table: { jumps, size,  compressed } } } = jumptables;
+            const { JUMP_TABLE: { table: { jumps, compressed } } } = jumptables;
+            // eslint-disable-next-line no-unused-expressions
             expect(compressed).to.be.true;
-            expect(jumps).to.deep.equal(['lsb_0'])
+            expect(jumps).to.deep.equal(['lsb_0']);
             const output = parser.processMacro('PACKED_TABLE_TEST', 0, [], macros, map, jumptables);
             const { jumpindices, bytecode } = output.data;
             expect(jumpindices.lsb_0).to.equal(5);
             expect(bytecode).to.equal('60026100065b0005');
-        })
+        });
     });
 
     describe('parse top level', () => {
@@ -307,15 +328,15 @@ describe('parser tests', () => {
             expect(result.sourcemap.length).to.equal(result.bytecode.length / 2);
         });
 
-        it(`can compile macro in sources object`, () => {
+        it('can compile macro in sources object', () => {
             const result = parser.compileMacro('ADD_ONE', sources, 'test.huff');
-            expect(result.bytecode).to.equal('600101')
-        })
+            expect(result.bytecode).to.equal('600101');
+        });
 
         it('can load file missing from sources object', () => {
             const result = parser.compileMacro('ADD_THREE', sources, 'testData/external.huff');
-            expect(result.bytecode).to.equal('600301')
-        })
+            expect(result.bytecode).to.equal('600301');
+        });
 
         it('frozen version of MAIN_TWO_ENDO_MOD macro is correctly compiled', () => {
             const result = parser.compileMacro('MAIN_TWO_ENDO_MOD', './main_loop.huff', pathToTestData);
@@ -329,13 +350,36 @@ describe('parser tests', () => {
             #define macro FOO = takes(0) returns (4) {
                 dup4 0x1234aae <p> <q> swap5
             }
-            
+
             #define macro BAR = takes(0) returns (1) {
                 __codesize(FOO<1,2>)
             }`;
 
             const { bytecode } = parser.compileMacro('BAR', source, '');
             expect(bytecode).to.equal('600b');
+        });
+
+        it('can process codesize macro as a literal', () => {
+            const source = `
+            template <const>
+            #define macro FOO = takes(0) returns (1) {
+                <const>
+            }
+
+            #define macro BAR = takes(0) returns(1) {
+                0x01023
+            }
+
+            #define macro BAR_SIZE = takes(0) returns (1) {
+                __codesize(BAR)
+            }
+
+            #define macro BAZ = takes(0) returns(1) {
+                FOO<0x10+BAR_SIZE>()
+            }`;
+
+            const { bytecode } = parser.compileMacro('BAZ', source, '');
+            expect(bytecode).to.equal('6014');
         });
     });
 });

@@ -1,7 +1,11 @@
 const grammar = {};
 
+function joinRegex(params) {
+    return params.join('\\s*\\n*');
+}
+
 function regex(params) {
-    const val = new RegExp(params.join('\\s*\\n*'));
+    const val = new RegExp(joinRegex(params));
     return val;
 }
 
@@ -12,10 +16,9 @@ grammar.topLevel = {
         '\\b(macro)\\b',
         '([A-Za-z0-9_]\\w*)',
         '=',
-        'takes',
-        '\\((\\d+)\\)',
-        'returns',
-        '\\((\\d+)\\)',
+        `(?:${
+            joinRegex(['takes', '\\((\\d+)\\)', 'returns', '\\((\\d+)\\)'])
+        })?`,
         '\\{((?:[^\\}])*)\\}',
     ]),
     CODE_TABLE: regex(['^(?:[\\s\\n]*#[\\s\\n]*define)', '\\b(table)\\b', '([A-Za-z0-9_]\\w*)', '\\{((?:[^\\}])*)\\}']),
