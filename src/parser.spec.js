@@ -40,6 +40,25 @@ describe('parser tests', () => {
             expect(parser.processMacroLiteral(source, macros).toString(16)).to.equal(new BN('1e2a2', 16).toString(16));
         });
 
+        it('processMacroLiteral will process a __codesize macro', () => {
+            const macros = {
+                FOO: {
+                    templateParams: [],
+                    name: 'FOO',
+                    ops: [{ type: 'PUSH', value: '62', args: ['01e2a2'] }],
+                },
+                FOO_SIZE: {
+                    templateParams: [],
+                    name: 'FOO_SIZE',
+                    ops: [{ type: 'CODESIZE', value: 'FOO', args: [] }],
+                },
+            };
+            const source = 'FOO_SIZE';
+            const map = { files: [{ data: '' }], startingIndices: [0] };
+            const result = parser.processMacroLiteral(source, macros, map);
+            expect(result.toString(16)).to.equal(new BN(4).toString(16));
+        });
+
         it('processTemplateLiteral will convert template literals to BN form', () => {
             const source = 'FOO+0x1234-222*BAR';
             const macros = {
@@ -219,7 +238,7 @@ describe('parser tests', () => {
         const source = `#define jumptable__packed JUMP_TABLE {
             lsb_0
         }
-        
+
         #define macro PACKED_TABLE_TEST = takes(0) returns(0) {
             __tablesize(JUMP_TABLE) __tablestart(JUMP_TABLE)
             lsb_0:
@@ -318,13 +337,36 @@ describe('parser tests', () => {
             #define macro FOO = takes(0) returns (4) {
                 dup4 0x1234aae <p> <q> swap5
             }
-            
+
             #define macro BAR = takes(0) returns (1) {
                 __codesize(FOO<1,2>)
             }`;
 
             const { bytecode } = parser.compileMacro('BAR', source, '');
             expect(bytecode).to.equal('600b');
+        });
+
+        it('can process codesize macro as a literal', () => {
+            const source = `
+            template <const>
+            #define macro FOO = takes(0) returns (1) {
+                <const>
+            }
+
+            #define macro BAR = takes(0) returns(1) {
+                0x01023
+            }
+
+            #define macro BAR_SIZE = takes(0) returns (1) {
+                __codesize(BAR)
+            }
+
+            #define macro BAZ = takes(0) returns(1) {
+                FOO<0x10+BAR_SIZE>()
+            }`;
+
+            const { bytecode } = parser.compileMacro('BAZ', source, '');
+            expect(bytecode).to.equal('6014');
         });
     });
 });
