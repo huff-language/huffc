@@ -720,7 +720,7 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
         const value = ops[0].args[0];
 
         if (storageLocations.includes(value)) {
-          errors.push(`Storage location for ${name} already exists`);
+          errors.push(`Storage location 0x${value} for macro ${name} already exists`);
         }
 
         storageLocations.push(ops[0].args[0]);
