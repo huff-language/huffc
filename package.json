@@ -10,6 +10,7 @@
     "bn.js": "^4.11.8",
     "ethereumjs-vm": "^2.5.1",
     "ethers": "^5.4.2",
+    "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
   "devDependencies": {
