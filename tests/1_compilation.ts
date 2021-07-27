@@ -4,7 +4,7 @@ import run, { test } from "./utils/test-helpers";
 
 test("Proxy compiles", async () => {
   const code = compile(
-    "Proxy.huff",
+    "1_Correct.huff",
     "./tests/contracts",
     encodeArgs(["address"], ["0x8733593b6418be9A0CCDEF9BbB8C0CC4E7bE88aC"]),
     {}
