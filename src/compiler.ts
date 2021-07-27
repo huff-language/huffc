@@ -1,13 +1,12 @@
 const parser = require("./language/parser");
 const { padNBytes, toHex } = require("./language/utils");
 
-export function generateBytecodeWithParameters(
-  filename: string,
-  paths: string,
-  parameters: string,
-  settings: any
-) {
-  return `generateBytecode(filename, paths, settings)${parameters}`;
+export default function compile(filename: string, paths: string, args: string, settings: any) {
+  return `${generateBytecode(filename, paths, {
+    mainMacro: "MAIN",
+    constructorMacro: "CONSTRUCTOR",
+    ...settings,
+  })}${args !== undefined ? args : ""}`;
 }
 
 export function generateBytecode(filename: string, paths: string, settings: any) {
