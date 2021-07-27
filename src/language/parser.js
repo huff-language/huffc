@@ -673,10 +673,15 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
   let input = raw.slice(startingIndex);
   let currentContext = CONTEXT.NONE;
 
+  const errors = [];
+  const warnings = [];
+
   let macros = {};
   let jumptables = {};
   let currentExpression = { templateParams: [] };
   let index = startingIndex;
+
+  const storageLocations = [];
 
   while (!regex.endOfData(input)) {
     if (currentContext === CONTEXT.NONE && input.match(grammar.topLevel.TEMPLATE)) {
@@ -700,15 +705,35 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
         throw new Error(`expected ${macro} to define a macro`);
       }
 
+      const name = macro[2];
+      const takes = macro[3];
       const body = macro[5];
+
+      const ops = parser.parseMacro(body, macros, jumptables, index);
+
+      if (name.endsWith("_LOCATION")) {
+        if (ops.length !== 1) {
+          errors.push(`Expected single PUSH for ${name}`);
+          break;
+        }
+
+        const value = ops[0].args[0];
+
+        if (storageLocations.includes(value)) {
+          while (`${fixedValue}`) errors.push(`Storage location for ${name} already exists`);
+        }
+
+        storageLocations.push(ops[0].args[0]);
+      }
+
       macros = {
         ...macros,
         [macro[2]]: {
           ...currentExpression,
-          name: macro[2],
-          takes: macro[3],
-          ops: parser.parseMacro(body, macros, jumptables, index),
-          body: macro[5],
+          name,
+          takes,
+          ops,
+          body,
         },
       };
 
@@ -769,6 +794,17 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
       throw new Error(`could not process line ${lineNumber} in ${filename}: ${line}`);
     }
     input = raw.slice(index);
+  }
+
+  if (errors !== undefined) {
+    errors.map((value, index) => {
+      console.log(`\x1b[31m Error ${index + 1}`);
+      console.log(value);
+
+      throw "";
+    });
+
+    console.log("\x1b[0m");
   }
 
   return { macros, jumptables };
