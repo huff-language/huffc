@@ -39,19 +39,24 @@ export default async function run(name: string) {
 
     try {
       const start = Date.now();
-      await tests[i].test();
+      if (tests[i].test.constructor.name == "AsyncFunction") {
+        await tests[i].test();
+      } else {
+        tests[i].test();
+      }
       const executionTime = Date.now() - start;
       const color = executionTime > 200 ? "\x1b[31m" : executionTime < 50 ? "\x1b[32m" : "\x1b[33m";
 
       console.log(
-        "\x1b[0m",
-        tests[i].name,
         "\x1b[32m",
         "✔",
+        "\x1b[0m",
+        tests[i].name,
         `${color}(${executionTime})${"\x1b[0m"}`
       );
     } catch (error) {
       errors.push({ name: tests[i].name, error });
+      console.log("\x1b[31m", "✖", "\x1b[0m", tests[i].name);
     }
   }
 
