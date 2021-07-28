@@ -1,13 +1,12 @@
 {
-  "name": "@aztec/huff",
-  "description": "Compiler for Huff, a DSL for low-level Ethereum smart contract programming",
-  "version": "0.0.2",
-  "author": "AZTEC",
-  "bugs": {
-    "url": "https://github.com/AztecProtocol/huff/issues"
-  },
+  "name": "huff-langauge",
+  "description": "A compiler for Huff, a low-level programming language for the Ethereum Virtual Machine",
+  "version": "0.0.1",
+  "author": "JetJadeja",
+  "bin": "./bin/huff-language",
   "dependencies": {
     "bn.js": "^4.11.8",
+    "commander": "^8.1.0",
     "ethereumjs-vm": "^2.5.1",
     "ethers": "^5.4.2",
     "ts-node": "^10.1.0",
@@ -27,7 +26,7 @@
   "engines": {
     "node": ">=8.3"
   },
-  "homepage": "https://github.com/AztecProtocol/huff/tree/master/#readme",
+  "homepage": "https://github.com/JetJadeja/huff",
   "keywords": [
     "blockchain",
     "ethereum",
@@ -40,7 +39,7 @@
   "main": "./src",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AztecProtocol/huff.git"
+    "url": "git+https://github.com/JetJadeja/huff.git"
   },
   "scripts": {
     "lint": "eslint --ignore-path ./.eslintignore .",
