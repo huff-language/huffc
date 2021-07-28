@@ -2,7 +2,7 @@ import compile from "../src/compiler";
 import encodeArgs from "./utils/encode";
 import run, { test } from "./utils/test-helpers";
 
-test("Proxy compiles", async () => {
+test("Functioning contract compiles succesfully", async () => {
   const code = compile(
     "1_Correct.huff",
     "./tests/contracts",
@@ -16,6 +16,16 @@ test("Proxy compiles", async () => {
   ) {
     throw "Code does not match";
   }
+});
+
+test("Compilation fails if contract has duplicate storage values", () => {
+  try {
+    const code = compile("2_Incorrect_Storage.huff", "./tests/contracts", "", {});
+  } catch (E) {
+    return;
+  }
+
+  throw new Error("Code did not fail");
 });
 
 run("Compiler");
