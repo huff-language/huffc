@@ -1,4 +1,4 @@
-import compile from "../src/compiler";
+import compile from "../src/huff/compiler";
 import encodeArgs from "./utils/encode";
 import run, { test } from "./utils/test-helpers";
 

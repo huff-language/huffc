@@ -1,5 +1,5 @@
 import { program } from "commander";
-import compiler from "./compiler";
+import compiler from "./huff/compiler";
 
 console.log("");
 
