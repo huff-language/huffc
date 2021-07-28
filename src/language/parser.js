@@ -716,7 +716,6 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
           errors.push(`Expected single PUSH for ${name}`);
           break;
         }
-
         const value = ops[0].args[0];
 
         if (storageLocations.includes(value)) {
@@ -796,15 +795,14 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
     input = raw.slice(index);
   }
 
-  if (errors !== undefined) {
-    errors.map((value, index) => {
-      console.log(`\x1b[31m Error ${index + 1}`);
-      console.log(value);
+  if (errors.length > 0) {
+    let message = "\x1b[31m\n";
 
-      throw "";
+    errors.map((value, index) => {
+      message = `${message}Error ${index + 1}\n${value}\n\n`;
     });
 
-    console.log("\x1b[0m");
+    throw new Error(message);
   }
 
   return { macros, jumptables };
