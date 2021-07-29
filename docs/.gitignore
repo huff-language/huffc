@@ -1,0 +1,4 @@
+.vercel
+node_modules
+**/.DS_Store
+src/.vuepress/dist
