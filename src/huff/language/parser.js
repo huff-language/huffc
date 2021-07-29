@@ -56,12 +56,12 @@ parser.processMacroLiteral = (op, macros) => {
   if (macros[op]) {
     check(
       macros[op].ops.length === 1 && macros[op].ops[0].type === TYPES.PUSH,
-      `cannot add ${op}, ${macros[op].ops} not a literal`
+      `Cannot add ${op}, ${macros[op].ops} not a literal`
     );
 
     return new BN(macros[op].ops[0].args[0], 16);
   }
-  throw new Error(`I don't know how to process literal ${op}`);
+  throw new Error(`Cannot process literal ${op}`);
 };
 
 parser.processTemplateLiteral = (literal, macros) => {
@@ -221,7 +221,7 @@ parser.processMacro = (
 
   if (result.unmatchedJumps.length > 0) {
     throw new Error(
-      `macro ${name}, unmatched jump labels ${JSON.stringify(
+      `Macro ${name}, unmatched jump labels ${JSON.stringify(
         result.unmatchedJumps
       )} found, cannot compile`
     );
@@ -262,14 +262,14 @@ parser.processMacro = (
 
   result.tableInstances.forEach((tableInstance) => {
     if (!tableOffsets[tableInstance.label]) {
-      throw new Error(`expected to find ${tableInstance.label} in ${JSON.stringify(tableOffsets)}`);
+      throw new Error(`Expected to find ${tableInstance.label} in ${JSON.stringify(tableOffsets)}`);
     }
 
     const { offset } = tableInstance;
     const placeholder = bytecode.slice(offset * 2 + 2, offset * 2 + 6);
 
     if (placeholder !== "xxxx") {
-      throw new Error(`expected ${placeholder} to be xxxx at offset ${tableInstance.offset}`);
+      throw new Error(`Expected ${placeholder} to be xxxx at offset ${tableInstance.offset}`);
     }
 
     const pre = bytecode.slice(0, offset * 2 + 2);
@@ -302,7 +302,7 @@ parser.processMacroInternal = (
   let macros = startingMacros;
   const macro = macros[name];
 
-  check(macro, `expected ${name} to exist!`);
+  check(macro, `Expected ${name} to exist!`);
 
   const { ops, templateParams } = macro;
   const templateArguments = templateArgumentsRaw.reduce(
@@ -312,7 +312,7 @@ parser.processMacroInternal = (
 
   check(
     templateParams.length === templateArguments.length,
-    `macro ${name} has invalid templated inputs!`
+    `Macro ${name} has invalid templated inputs!`
   );
 
   const templateRegExps = templateParams.map((label, i) => {
@@ -347,7 +347,7 @@ parser.processMacroInternal = (
       }
       case TYPES.TEMPLATE: {
         const macroNameIndex = templateParams.indexOf(op.value);
-        check(index !== -1, `cannot find template ${op.value}`);
+        check(index !== -1, `Cannot find template ${op.value}`);
         // what is this template? It's either a macro or a template argument;
         let templateName = templateArguments[macroNameIndex];
         ({ macros, templateName } = parser.parseTemplate(templateName, macros, index));
@@ -368,7 +368,7 @@ parser.processMacroInternal = (
       }
 
       case TYPES.CODESIZE: {
-        check(index !== -1, `cannot find macro ${op.value}`);
+        check(index !== -1, `Cannot find macro ${op.value}`);
         const result = parser.processMacroInternal(
           op.value,
           offset,
@@ -397,7 +397,7 @@ parser.processMacroInternal = (
       }
 
       case TYPES.PUSH: {
-        check(op.args.length === 1, `wrong argument count for PUSH, ${JSON.stringify(op)}`);
+        check(op.args.length === 1, `Wrong argument count for PUSH, ${JSON.stringify(op)}`);
         const codebytes = 1 + op.args[0].length / 2;
         const sourcemap = [inputMaps.getFileLine(op.index, map)];
         offset += codebytes;
@@ -437,7 +437,7 @@ parser.processMacroInternal = (
       }
 
       default: {
-        check(false, `could not interpret op ${JSON.stringify(op)}`);
+        check(false, `Could not interpret op ${JSON.stringify(op)}`);
         return null;
       }
     }
@@ -466,7 +466,7 @@ parser.processMacroInternal = (
             const post = formattedBytecode.slice(bytecodeIndex + 6);
             if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== "xxxx") {
               throw new Error(
-                `expected indicies ${bytecodeIndex + 2} to ${
+                `Expected indicies ${bytecodeIndex + 2} to ${
                   bytecodeIndex + 6
                 } to be jump location, of
                             ${formattedBytecode}`
@@ -543,7 +543,7 @@ parser.parseMacro = (body, macros, jumptables, startingIndex = 0) => {
       const macroName = token[1];
       const templateArgs = token[2] ? [token[2]] : [];
 
-      check(macros[macroName], `expected ${macroName} to be a macro`);
+      check(macros[macroName], `Expected ${macroName} to be a macro`);
 
       ops.push({
         type: TYPES.MACRO,
@@ -580,7 +580,7 @@ parser.parseMacro = (body, macros, jumptables, startingIndex = 0) => {
       const table = token[1];
 
       if (!jumptables[table]) {
-        throw new Error(`could not find jumptable ${table} in ${jumptables}`);
+        throw new Error(`Could not find jumptable ${table} in ${jumptables}`);
       }
 
       const hex = formatEvenBytes(toHex(jumptables[table].table.size));
@@ -605,7 +605,7 @@ parser.parseMacro = (body, macros, jumptables, startingIndex = 0) => {
       index += token[0].length;
     } else if (input.match(grammar.macro.JUMP_LABEL)) {
       const token = input.match(grammar.macro.JUMP_LABEL);
-      check(!jumpdests[token[1]], `jump label ${token[1]} has already been defined`);
+      check(!jumpdests[token[1]], `Jump label ${token[1]} has already been defined`);
 
       ops.push({
         type: TYPES.JUMPDEST,
@@ -660,7 +660,7 @@ parser.parseMacro = (body, macros, jumptables, startingIndex = 0) => {
       }
       index += token[0].length;
     } else {
-      throw new Error(`cannot parse ${input}!`);
+      throw new Error(`Cannot parse ${input}!`);
     }
 
     input = body.slice(index);
@@ -702,7 +702,7 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
       const macro = input.match(grammar.topLevel.MACRO);
       const type = macro[1];
       if (type !== "macro") {
-        throw new Error(`expected ${macro} to define a macro`);
+        throw new Error(`Expected ${macro} to define a macro`);
       }
 
       const name = macro[2];
@@ -757,7 +757,7 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
       const type = jumptable[1];
 
       if (type !== "jumptable__packed") {
-        throw new Error(`expected ${jumptable} to define a packed jump table`);
+        throw new Error(`Expected ${jumptable} to define a packed jump table`);
       }
 
       const body = jumptable[3];
@@ -775,7 +775,7 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
       const type = jumptable[1];
 
       if (type !== "jumptable") {
-        throw new Error(`expected ${jumptable} to define a jump table`);
+        throw new Error(`Expected ${jumptable} to define a jump table`);
       }
 
       const body = jumptable[3];
@@ -790,16 +790,16 @@ parser.parseTopLevel = (raw, startingIndex, inputMap) => {
       index += jumptable[0].length;
     } else {
       const { filename, lineNumber, line } = inputMaps.getFileLine(index, inputMap);
-      throw new Error(`could not process line ${lineNumber} in ${filename}: ${line}`);
+      throw new Error(`Could not process line ${lineNumber} in ${filename}: ${line}`);
     }
     input = raw.slice(index);
   }
 
   if (errors.length > 0) {
-    let message = "\x1b[31m\n";
+    let message = "";
 
     errors.map((value, index) => {
-      message = `${message}Error ${index + 1}\n${value}\n\n`;
+      message += `${value}\n\n`;
     });
 
     throw new Error(message);
