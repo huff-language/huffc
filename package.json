@@ -3,7 +3,9 @@
   "description": "A compiler for Huff, a low-level programming language for the Ethereum Virtual Machine",
   "version": "0.0.1",
   "author": "JetJadeja",
-  "bin": "./bin/huff-language",
+  "bin": {
+    "huff": "./bin/huff"
+  },
   "dependencies": {
     "bn.js": "^4.11.8",
     "commander": "^8.1.0",
