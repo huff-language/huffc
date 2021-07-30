@@ -12,9 +12,20 @@ module.exports = {
 
   themeConfig: {
     docsDir: "/",
-    nav: [{ text: "Get Started", link: "/get-started/" }],
+    nav: [
+      { text: "Home", link: "/" },
+      { text: "Get Started", link: "/get-started/" },
+    ],
     sidebarDepth: 10,
-    sidebar: "auto",
+    sidebar: {
+      "/get-started/": [
+        {
+          title: "Get Started",
+          collapsable: false,
+          children: ["/get-started/introduction/", "/get-started/installation/"],
+        },
+      ],
+    },
     smoothScroll: true,
   },
 };
