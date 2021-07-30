@@ -24,7 +24,7 @@ if (command === "compile") {
     try {
       console.log("-----------------------------");
       console.log(`\x1b[1mCompiling ${path[path.length - 1]}`, "\n\x1b[0m");
-      const code = `0x${compiler(process.argv[i], options.dir, options.args, {})}`;
+      const code = `0x${compiler(process.argv[i], options.dir, options.args)}`;
       console.log("\x1b[32m", "Compiled Sucessfully", "\x1b[0m");
       console.log(code, "\n");
     } catch (e) {
@@ -35,8 +35,34 @@ if (command === "compile") {
   for (let i = 0; i < errors.length; i++) {
     console.log(errors[i]);
   }
+} else if (command === "help" || !command) {
+  console.log(`
+                                                                                    
+                                                                                
+                                     (@@@/                                      
+                                 &&&&&@#&&&&&&&                                 
+                               &&&&&&&&&&&&&&                                   
+                                &&&&&&@&&&&@&&                                  
+                              @#&&&& &&&&&&&&&&                                 
+                              &&@&&&@&&&@&&&&&&&                                
+                               &&&&&@&&.@   &&&@                                
+                               @&@&&&&&&&.@.                                    
+                                &.&&&&&&&&&.&&                                  
+                                &@&&&&&&&&&& &&                                 
+                                 &&&&&&&&&&&&&                                  
+                                  &&&&&&&&&&&%                                  
+                                   &&&&&&&&&&                                   
+                                 %&&&&&&&&&&&&                                  
+                               &&&&&&&&&&&&%%%%&                                
+                                                      
+  `);
+  console.log(`
+                             _    _        __  __ 
+                            | |  | |      / _|/ _|
+                            | |__| |_   _| |_| |_ 
+                            |  __  | | | |  _|  _|
+                            | |  | | |_| | | | |  
+                            |_|  |_|\__,_|_| |_|  
+                        
+  `);
 }
-
-// if () {
-//   console.log(`0x${compiler(options.compile, options.dir, options.args, {})}`);
-// }
