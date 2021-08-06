@@ -22,7 +22,12 @@ module.exports = {
         {
           title: "Get Started",
           collapsable: false,
-          children: ["/get-started/introduction/", "/get-started/installation/"],
+          children: [
+            "/get-started/introduction/",
+            "/get-started/installation/",
+            "/get-started/evm-basics/",
+            "/get-started/first-contract/",
+          ],
         },
       ],
     },

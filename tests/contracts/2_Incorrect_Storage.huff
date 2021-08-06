@@ -1,15 +1,5 @@
-#define macro FIRST_LOCATION = takes(0) returns(1) {
-    0x00
-}
-
-#define macro SECOND_LOCATION = takes (0) returns (1) {
-    0x00
-}
-
-#define macro CONSTRUCTOR = takes (0) returns (1) {
-    FIRST_LOCATION()
-}
+#define macro CONSTRUCTOR = takes (0) returns (1) {}
 
 #define macro MAIN = takes (0) returns (1) {
-    SECOND_LOCATION()
+    0x05 0x02 mul return
 }

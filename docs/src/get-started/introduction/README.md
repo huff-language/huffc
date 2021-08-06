@@ -10,6 +10,6 @@ Huff barely hides the inner-workings of the EVM behind syntactic sugar. Rather t
 
 Huff was orginally developed by [Aztec Protocol](https://github.com/AztecProtocol) to create [Weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules), an elliptic curve arithmetic library that required extremely optimized code that could not be written on Solidity or even inline assembly.
 
-Huff is designed for developing extremely optimized smart contract code, where the direct manipulation of a program's bytecode is beneficial. Using the Huff runtime testing suite, each macro can be rigorously tested without having to split the program into functions and invoke jump instructions.
+Huff is designed for developing extremely optimized smart contract code, where the direct manipulation of a program's bytecode is beneficial to the developer. Using the Huff runtime testing suite, each macro can be rigorously evaluated without having to split the contract into seperate functions.
 
 Beyond writing performant code, learning Huff can teach you all about the Ethereum Virtual Machine as well as develop your understanding of other EVM programming languages like Solidity and Vyper.
