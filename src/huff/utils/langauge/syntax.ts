@@ -2,10 +2,27 @@
 import { combineRegexElements } from "../helpers/regex";
 
 /* High Level Syntax */
-export const highLevelSyntax = {
+export const HIGH_LEVEL = {
+  IMPORT: combineRegexElements([
+    /* "#" At the start of a line */
+    "^(?:[\\s\\n]*)#",
+
+    /* The word "include" */
+    "(?:include)",
+
+    /* Quotation marks */
+    "(?:\\\"|\\')",
+
+    /* All alphanumeric characters, representing the filename */
+    "(.*)",
+
+    /* Quotation marks */
+    "(?:\\\"|\\')",
+  ]),
+
   /* Syntax for templates */
   TEMPLATE: combineRegexElements([
-    /* Requires "template" at the start of the line */
+    /* The word "template" at the start of the line */
     "^(?:[\\s\\n]*)template",
 
     /* Pair of brackets (<>) that can contain anything */
@@ -101,4 +118,102 @@ export const highLevelSyntax = {
      */
     "\\{((?:[^\\}])*)\\}",
   ]),
+};
+
+/* Jump Table Syntax */
+export const JUMP_TABLES = {
+  /* All characters, with any number of whitespace before and after */
+  jumps: new RegExp("(?:[\\s\\n]*)[a-zA-Z_0-9\\-]+(?:$|\\s+)", "g"),
+};
+
+/* Code Syntax, found within macros */
+export const MACRO_CODE = {
+  /* Any text before spaces and newlines */
+  TOKEN: combineRegexElements(["\\s*\\n*([^\\s]*)\\s*\\n*"]),
+
+  /* Any numeric value */
+  LITERAL_DECIMAL: combineRegexElements(["^(?:[\\s\\n]*)(\\d+)\\b"]),
+
+  /* Any alphanumeric combination followed by 0x */
+  LITERAL_HEX: combineRegexElements(["^(?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b"]),
+
+  /* Syntax for macro calls */
+  MACRO_CALL: combineRegexElements([
+    /* Any number of alphanumeric characters + underscores */
+    "^(?:[\\s\\n]*)([a-zA-Z0-9_]+)",
+
+    /* An optional pair of brackets that must contain characters (template parameters) */
+    "(?:<([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)>)?",
+
+    /* Parenthesis at the end of the macro call */
+    "(?:\\(\\))",
+  ]),
+
+  TEMPLATE_CALL: combineRegexElements([
+    /* Open bracket */
+    "^(?:[\\s\\n]*)<",
+
+    /* Any alphanumeric combination */
+    "([a-zA-Z0-9_\\-\\+\\*]+)",
+
+    /* Closing bracket */
+    ">\\s*\\n*",
+  ]),
+
+  /* Syntax for the builtin codesize function */
+  CODE_SIZE: combineRegexElements([
+    /* The string "__codesize" */
+    "^(?:[\\s\\n]*)__codesize",
+
+    /* Open Parenthesis */
+    "\\(",
+
+    /* Any alphanumeric combination */
+    "([a-zA-Z0-9_\\-]+)",
+
+    /* Template Arguments */
+    "(?:<([a-zA-Z0-9_,\\s\\n]+)>)?",
+
+    /* Closing parenthesis */
+    "\\)\\s*\\n*",
+  ]),
+
+  /* Syntax for the builtin table size function */
+  TABLE_SIZE: combineRegexElements([
+    /* The string "__tablesize" */
+    "^(?:[\\s\\n]*)__tablesize",
+
+    /* Open Parenthesis */
+    "\\(",
+
+    /* Any alphanumeric combination */
+    "([a-zA-Z0-9_\\-]+)",
+
+    /* Template Arguments */
+    "(?:<([a-zA-Z0-9_,\\s\\n]+)>)?",
+
+    /* Closing parenthesis */
+    "\\)\\s*\\n*",
+  ]),
+
+  /* Syntax for the builtin table start function */
+  TABLE_START: combineRegexElements([
+    /* The string "__tablestart" */
+    "^(?:[\\s\\n]*)__tablestart",
+
+    /* Open Parenthesis */
+    "\\(",
+
+    /* Any alphanumeric combination */
+    "([a-zA-Z0-9_\\-]+)",
+
+    /* Template Arguments */
+    "(?:<([a-zA-Z0-9_,\\s\\n]+)>)?",
+
+    /* Closing parenthesis */
+    "\\)\\s*\\n*",
+  ]),
+
+  /* Syntax for jumptables */
+  JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
 };
