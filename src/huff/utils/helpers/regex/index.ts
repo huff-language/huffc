@@ -1,3 +1,6 @@
+import { comma, space, operator } from "./constants";
+import { MACRO_CODE } from "../../langauge/syntax";
+
 /**
  * Combine an array of regex strings into one, seperated by "\\s*\\n*"
  */
