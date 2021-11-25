@@ -65,6 +65,24 @@ export const HIGH_LEVEL = {
     "\\{((?:[^\\}])*)\\}",
   ]),
 
+  /* Syntax for constants */
+  CONSTANT: combineRegexElements([
+    /* "#define" at the start of the line */
+    "^(?:[\\s\\n]*#[\\s\\n]*define)",
+
+    /* The whole word "constant" */
+    "\\b(constant)\\b",
+
+    /* The name of the constant, which can be everything */
+    "([A-Za-z0-9_]\\w*)",
+
+    /* Equals sign */
+    "=",
+
+    /* Hex literal */
+    "(?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b",
+  ]),
+
   /* Syntax for code tables */
   CODE_TABLE: combineRegexElements([
     /* "#define" at the start of the line */
@@ -217,3 +235,6 @@ export const MACRO_CODE = {
   /* Syntax for jumptables */
   JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
 };
+
+console.log("test");
+console.log(HIGH_LEVEL.CONSTANT);
