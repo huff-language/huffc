@@ -80,7 +80,7 @@ export const HIGH_LEVEL = {
     "=",
 
     /* Hex literal */
-    "(?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b",
+    "(((?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b)|(FREE_STORAGE_POINTER\\(\\)))",
   ]),
 
   /* Syntax for code tables */
