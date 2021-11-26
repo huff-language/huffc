@@ -14,18 +14,18 @@ const parseFile = (path: string): any => {
 };
 
 /**
- * Given file data, return three arrays containing the macros, constants, and tables.
+ * Given file data, return three maps containing the macros, constants, and tables.
  */
 const getHighLevelDefinitions = (
   data: { filename: string; data: string }[]
 ): {
-  macros: { name: string; raw: string }[];
-  constants: { name: string; value: string }[];
+  macros: { [name: string]: { takes: number; body: string } };
+  constants: { [name: string]: string };
   tables: { name: string; raw: string }[];
 } => {
   // Arrays
-  const macros: { name: string; raw: string }[] = [];
-  const constants: { name: string; value: string }[] = [];
+  const macros: { [name: string]: { takes: number; body: string } } = {};
+  const constants: { [name: string]: string } = {};
   const tables: { name: string; raw: string }[] = [];
 
   // Parse the data
@@ -40,17 +40,18 @@ const getHighLevelDefinitions = (
         // Parse macro definition.
         const macro = input.match(HIGH_LEVEL.MACRO);
 
-        // Add the macro to the array.
-        macros.push({ name: macro[2], raw: macro[0] });
+        // macros[name] = {body, takes}
+        macros[macro[2]] = { body: macro[5], takes: parseInt(macro[3]) };
 
         // Slice the input
         input = input.slice(macro[0].length);
       } else if (HIGH_LEVEL.CONSTANT.test(input)) {
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
+        const value = constant[3];
 
         // Add the constant to the array.
-        constants.push({ name: constant[2], value: `0x${constant[3]}` });
+        constants[constant[2]] = value == "FREE_STORAGE_POINTER()" ? value : `0x${constant[3]}`;
 
         // Slice the input
         input = input.slice(constant[0].length);
@@ -63,7 +64,13 @@ const getHighLevelDefinitions = (
     }
   });
 
-  return { macros, constants, tables };
+  return {
+    macros,
+    constants,
+    tables,
+  };
+
+  //return { macros, constants, tables };
 };
 
 /**
