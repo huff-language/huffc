@@ -1,5 +1,3 @@
-/* High level parser for Huff files */
-
 /* Utils */
 import { readFile } from "../../utils/helpers/data/files";
 import { HIGH_LEVEL } from "../../utils/langauge/syntax";
