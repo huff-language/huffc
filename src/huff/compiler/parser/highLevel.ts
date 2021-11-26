@@ -50,7 +50,7 @@ const getHighLevelDefinitions = (
         const constant = input.match(HIGH_LEVEL.CONSTANT);
 
         // Add the constant to the array.
-        constants.push({ name: constant[2], value: constant[3] });
+        constants.push({ name: constant[2], value: `0x${constant[3]}` });
 
         // Slice the input
         input = input.slice(constant[0].length);
