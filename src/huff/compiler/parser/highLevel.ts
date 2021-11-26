@@ -45,6 +45,11 @@ const getHighLevelDefinitions = (
 
         // Slice the input
         input = input.slice(constant[0].length);
+      } else {
+        const index = input.indexOf("\n");
+        if (index !== -1) {
+          input = input.slice(index);
+        }
       }
     }
   });
@@ -66,6 +71,7 @@ const getFileContents = (path: string): { filename: string; data: string }[] => 
   // We instantiate this locally because we need to use it recursively to read all imports.
   const readFileData = (path: string): { filename: string; data: string }[] => {
     // Read the data from the file.
+
     const fileString = removeComments(readFile(path));
     let includes: { filename: string; data: string }[] = [{ filename: path, data: fileString }];
 
