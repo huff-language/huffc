@@ -7,7 +7,7 @@ import { isEndOfData } from "../helpers/regex";
  */
 export const removeComments = (data: string): string => {
   // The formatted version of our string.
-  let formattedData: string;
+  let formattedData: string = "";
 
   while (!isEndOfData(data)) {
     // Store the index of the next single line comment.
