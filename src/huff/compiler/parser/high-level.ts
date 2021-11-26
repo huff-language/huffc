@@ -115,3 +115,6 @@ const getImports = (raw: string): string[] => {
 
   return imports;
 };
+
+// Default export should be parseFile.
+export default parseFile;
