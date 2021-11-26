@@ -5,6 +5,15 @@ import { removeComments } from "../../utils/langauge/parsing";
 import { isEndOfData } from "../../utils/helpers/regex";
 
 /**
+ * @param path File path to be parsed.
+ * @returns Three arrays, containing the macros, constants, and tables
+ * from the Huff file and from all files that it imports.
+ */
+const parseFile = (path: string): any => {
+  return getHighLevelDefinitions(getFileContents(path));
+};
+
+/**
  * Given file data, return three arrays containing the macros, constants, and tables.
  */
 const getHighLevelDefinitions = (
