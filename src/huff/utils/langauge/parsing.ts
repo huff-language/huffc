@@ -5,7 +5,7 @@ import { isEndOfData } from "../helpers/regex";
  * Given a string, generate a new string without inline comments
  * @param data A string of data to parse
  */
-export const removeCommentsFromData = (data: string): string => {
+export const removeComments = (data: string): string => {
   // The formatted version of our string.
   let formattedData: string;
 
