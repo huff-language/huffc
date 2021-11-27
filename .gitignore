@@ -2,3 +2,4 @@ node_modules
 .nyc_output
 yarn.lock
 huff_modules
+testValues

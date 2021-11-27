@@ -1,6 +1,7 @@
 /* Utils */
 import { isEndOfData } from "../../utils/helpers/regex";
 import { MACRO_CODE } from "../../utils/langauge/syntax";
+
 import {
   convertNumberToBytes,
   convertBytesToNumber,
@@ -32,10 +33,12 @@ export const getUsedDefinitions = (
   macrosToParse.forEach((name) => {
     // Retrieve macro from map.
     const macro = data.macros[name];
-    let body = macro.body;
 
     // If the macro doesn't exist, move to the next macro.
     if (!macro) return;
+
+    // Get the body of the macro.
+    let body = macro.body;
 
     // Iterate over the macro body.
     while (!isEndOfData(body)) {
@@ -43,14 +46,16 @@ export const getUsedDefinitions = (
       if (body.match(MACRO_CODE.FUNCTION_CALL)) {
         const name = body.match(MACRO_CODE.FUNCTION_CALL)[1];
 
-        if (data.macros[name]) {
+        if (data.macros[name] !== undefined) {
           // Add macro to list.
           macros.push(name);
-        } else if (data.constants[name]) {
-          macros.push(name);
+        } else if (data.constants[name] !== undefined) {
+          constants.push(name);
         } else {
           throw `${name} is not defined`;
         }
+
+        body = body.slice(body.match(MACRO_CODE.FUNCTION_CALL)[0].length);
       } else {
         body = body.slice(1);
       }
