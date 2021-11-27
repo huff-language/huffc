@@ -149,14 +149,11 @@ export const MACRO_CODE = {
   /* Any text before spaces and newlines */
   TOKEN: combineRegexElements(["\\s*\\n*([^\\s]*)\\s*\\n*"]),
 
-  /* Any numeric value */
-  LITERAL_DECIMAL: combineRegexElements(["^(?:[\\s\\n]*)(\\d+)\\b"]),
-
   /* Any alphanumeric combination followed by 0x */
   LITERAL_HEX: combineRegexElements(["^(?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b"]),
 
-  /* Syntax for macro calls */
-  MACRO_CALL: combineRegexElements([
+  /* Syntax for macro and constant calls */
+  FUNCTION_CALL: combineRegexElements([
     /* Any number of alphanumeric characters + underscores */
     "^(?:[\\s\\n]*)([a-zA-Z0-9_]+)",
 
