@@ -9,7 +9,16 @@ import { isEndOfData } from "../../utils/helpers/regex";
  * @returns Three arrays, containing the macros, constants, and tables
  * from the Huff file and from all files that it imports.
  */
-const parseFile = (path: string): any => {
+const parseFile = (
+  path: string
+): [
+  {
+    macros: { [name: string]: { takes: number; body: string } };
+    constants: { [name: string]: string };
+    tables: { name: string; raw: string }[];
+  },
+  { macros: string[]; constants: string[] }
+] => {
   return getHighLevelDefinitions(getFileContents(path));
 };
 
@@ -18,15 +27,26 @@ const parseFile = (path: string): any => {
  */
 const getHighLevelDefinitions = (
   data: { filename: string; data: string }[]
-): {
-  macros: { [name: string]: { takes: number; body: string } };
-  constants: { [name: string]: string };
-  tables: { name: string; raw: string }[];
-} => {
-  // Arrays
+): [
+  {
+    macros: { [name: string]: { takes: number; body: string } };
+    constants: { [name: string]: string };
+    tables: { name: string; raw: string }[];
+  },
+  { macros: string[]; constants: string[] }
+] => {
+  // Dictionaries
   const macros: { [name: string]: { takes: number; body: string } } = {};
   const constants: { [name: string]: string } = {};
   const tables: { name: string; raw: string }[] = [];
+
+  /*
+   * Arrays
+   * We store these in order to preserve the defined order of macros and constants.
+   * This is important to know, because it is sometimes helpful to define functions in a specific order
+   */
+  const macrosArray: string[] = [];
+  const constantsArray: string[] = [];
 
   // Parse the data
   data.forEach((file) => {
@@ -43,6 +63,9 @@ const getHighLevelDefinitions = (
         // macros[name] = {body, takes}
         macros[macro[2]] = { body: macro[5], takes: parseInt(macro[3]) };
 
+        // Add macro to macrosArray.
+        macrosArray.push(macro[2]);
+
         // Slice the input
         input = input.slice(macro[0].length);
       } else if (HIGH_LEVEL.CONSTANT.test(input)) {
@@ -50,8 +73,11 @@ const getHighLevelDefinitions = (
         const constant = input.match(HIGH_LEVEL.CONSTANT);
         const value = constant[3];
 
-        // Add the constant to the array.
+        // constants[name] = value.
         constants[constant[2]] = value == "FREE_STORAGE_POINTER()" ? value : `0x${constant[3]}`;
+
+        // Add constant to constantsArray.
+        constantsArray.push(constant[2]);
 
         // Slice the input
         input = input.slice(constant[0].length);
@@ -64,11 +90,14 @@ const getHighLevelDefinitions = (
     }
   });
 
-  return {
-    macros,
-    constants,
-    tables,
-  };
+  return [
+    {
+      macros,
+      constants,
+      tables,
+    },
+    { macros: macrosArray, constants: constantsArray },
+  ];
 
   //return { macros, constants, tables };
 };
