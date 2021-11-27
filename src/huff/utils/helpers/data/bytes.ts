@@ -20,3 +20,10 @@ export const convertNumberToBytes = (number: number): string => {
 export const findLowest = (value: number, arr: number[]) => {
   return arr.indexOf(value) < 0 ? value : findLowest(value + 1, arr);
 };
+
+/**
+ * Given two arrays, remove all elements from the first array that aren't in the second
+ */
+export const removeNonMatching = (arr1: any[], arr2: any[]) => {
+  return arr1.filter((val) => arr2.includes(val));
+};
