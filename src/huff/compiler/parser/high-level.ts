@@ -74,7 +74,7 @@ const getHighLevelDefinitions = (
         const value = constant[3];
 
         // constants[name] = value.
-        constants[constant[2]] = value == "FREE_STORAGE_POINTER()" ? value : `0x${constant[3]}`;
+        constants[constant[2]] = value;
 
         // Add constant to constantsArray.
         constantsArray.push(constant[2]);
