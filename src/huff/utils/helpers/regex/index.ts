@@ -49,8 +49,6 @@ export const containsOperators = (input: string) => {
 export const isLiterals = (input: string) => {
   if (containsOperators(input)) {
     return true;
-  } else if (input.match(MACRO_CODE.LITERAL_DECIMAL)) {
-    return true;
   } else if (input.match(MACRO_CODE.LITERAL_HEX)) {
     return true;
   }
