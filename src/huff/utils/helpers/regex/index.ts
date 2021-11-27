@@ -1,5 +1,4 @@
 import { comma, space, operator } from "./constants";
-import { MACRO_CODE } from "../../langauge/syntax";
 
 /**
  * Combine an array of regex strings into one, seperated by "\\s*\\n*"
@@ -41,17 +40,4 @@ export const countSpaces = (data: string): number => {
  */
 export const containsOperators = (input: string) => {
   return operator.test(input);
-};
-
-/**
- * @returns A boolean inidicating whether the string is a literal
- */
-export const isLiterals = (input: string) => {
-  if (containsOperators(input)) {
-    return true;
-  } else if (input.match(MACRO_CODE.LITERAL_HEX)) {
-    return true;
-  }
-
-  return false;
 };
