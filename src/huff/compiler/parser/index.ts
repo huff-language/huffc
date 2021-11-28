@@ -1,4 +1,4 @@
-/* Parse File */
+/* Parser */
 import { getUsedDefinitions, setStoragePointerConstants } from "./definitions";
 import parseFile from "./high-level";
 
@@ -9,7 +9,12 @@ import { removeNonMatching } from "../../utils/helpers/data/bytes";
  * Given a file, generate data to be compiled.
  * @param path The file to parse.
  */
-const parse = (path: string) => {
+const parse = (
+  path: string
+): {
+  macros: { [name: string]: { takes: number; body: string } };
+  constants: { [name: string]: string };
+} => {
   let [{ macros, constants }, { macros: orderedMacros, constants: orderedConstants }] =
     parseFile(path);
   const { macros: usedMacros, constants: usedConstants } = getUsedDefinitions(
@@ -27,4 +32,9 @@ const parse = (path: string) => {
 
   // Set storage pointers
   setStoragePointerConstants(constants, orderedConstants);
+
+  // Return the data
+  return { macros, constants };
 };
+
+export default parse;
