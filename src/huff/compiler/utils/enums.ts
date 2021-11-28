@@ -13,7 +13,7 @@ export enum TokenType {
 }
 
 export type Definitions = {
-  macros: { [name: string]: { args: number; body: string } };
+  macros: { [name: string]: { args: string[]; body: string } };
   constants: { [name: string]: string };
   tables: { name: string; raw: string }[];
 };

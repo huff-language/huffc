@@ -32,7 +32,7 @@ export const getHighLevelDefinitions = (
   data: { filename: string; data: string }[]
 ): [Definitions, { macros: string[]; constants: string[] }] => {
   // Dictionaries
-  const macros: { [name: string]: { args: number; body: string } } = {};
+  const macros: { [name: string]: { args: string[]; body: string } } = {};
   const constants: { [name: string]: string } = {};
   const tables: { name: string; raw: string }[] = [];
 
@@ -60,7 +60,7 @@ export const getHighLevelDefinitions = (
         console.log(parseArgs(macro[3]));
 
         // macros[name] = {body, takes}
-        macros[macro[2]] = { body: macro[7], args: parseInt(macro[3]) };
+        macros[macro[2]] = { body: macro[7], args: parseArgs(macro[3]) };
 
         // Add macro to macrosArray.
         macrosArray.push(macro[2]);
