@@ -110,7 +110,7 @@ const getHighLevelDefinitions = (
  * @returns An array of maps, containing the filename and raw data
  * and a string containing the raw data of all files combined
  */
-const getFileContents = (path: string): { filename: string; data: string }[] => {
+export const getFileContents = (path: string): { filename: string; data: string }[] => {
   // Array of filedata.
   const includes: { filename: string; data: string }[] = [];
 
@@ -136,7 +136,7 @@ const getFileContents = (path: string): { filename: string; data: string }[] => 
 /**
  * @returns an array of imported files
  */
-const getImports = (raw: string): string[] => {
+export const getImports = (raw: string): string[] => {
   const imports: string[] = [];
   let nextImport = raw.match(HIGH_LEVEL.IMPORT);
 
