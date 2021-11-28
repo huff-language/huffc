@@ -40,6 +40,9 @@ export const HIGH_LEVEL = {
     /* The name of the macro, which can be anything */
     "([A-Za-z0-9_]\\w*)",
 
+    /* Parenthesis that can contain anything (macro arguments) */
+    "\\(((.*))\\)",
+
     /* Equals sign */
     "=",
 
@@ -238,3 +241,5 @@ export const MACRO_CODE = {
   /* Syntax for jumptables */
   JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
 };
+
+console.log(HIGH_LEVEL.MACRO);
