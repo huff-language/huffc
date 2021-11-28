@@ -152,8 +152,8 @@ export const MACRO_CODE = {
   /* Any alphanumeric combination followed by 0x */
   LITERAL_HEX: combineRegexElements(["^(?:[\\s\\n]*)0x([0-9a-fA-F]+)\\b"]),
 
-  /* Syntax for macro and constant calls */
-  FUNCTION_CALL: combineRegexElements([
+  /* Syntax for macro calls */
+  MACRO_CALL: combineRegexElements([
     /* Any number of alphanumeric characters + underscores */
     "^(?:[\\s\\n]*)([a-zA-Z0-9_]+)",
 
@@ -162,6 +162,12 @@ export const MACRO_CODE = {
 
     /* Parenthesis at the end of the macro call */
     "(?:\\(\\))",
+  ]),
+
+  /* Syntax for constant calls */
+  CONSTANT_CALL: combineRegexElements([
+    /* Any number of alphanumeric characters + underscores */
+    "^(?:[\\s\\n]*)([A-Z0-9_]+)",
   ]),
 
   TEMPLATE_CALL: combineRegexElements([

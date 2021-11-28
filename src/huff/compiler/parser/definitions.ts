@@ -42,20 +42,17 @@ export const getUsedDefinitions = (
 
     // Iterate over the macro body.
     while (!isEndOfData(body)) {
-      // If the data is a function.
-      if (body.match(MACRO_CODE.FUNCTION_CALL)) {
-        const name = body.match(MACRO_CODE.FUNCTION_CALL)[1];
+      // If the next call is a constant call.
+      if (body.match(MACRO_CODE.CONSTANT_CALL)) {
+        const name = body.match(MACRO_CODE.CONSTANT_CALL)[1];
 
-        if (data.macros[name] !== undefined) {
-          // Add macro to list.
-          macros.push(name);
-        } else if (data.constants[name] !== undefined) {
+        if (data.constants[name] !== undefined) {
           constants.push(name);
         } else {
           throw `${name} is not defined`;
         }
 
-        body = body.slice(body.match(MACRO_CODE.FUNCTION_CALL)[0].length);
+        body = body.slice(body.match(MACRO_CODE.CONSTANT_CALL)[0].length);
       } else {
         body = body.slice(1);
       }

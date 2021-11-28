@@ -71,13 +71,15 @@ const getHighLevelDefinitions = (
       } else if (HIGH_LEVEL.CONSTANT.test(input)) {
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
+        const name = constant[2];
         const value = constant[3];
 
-        // constants[name] = value.
-        constants[constant[2]] = value;
+        // Ensure that the constant name is all uppercase.
+        if (name.toUpperCase() !== name) throw new Error(`Constant ${name} is not uppercase`);
 
-        // Add constant to constantsArray.
-        constantsArray.push(constant[2]);
+        // Add values to compiler data
+        constants[name] = value;
+        constantsArray.push(name);
 
         // Slice the input
         input = input.slice(constant[0].length);
