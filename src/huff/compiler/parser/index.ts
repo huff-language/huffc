@@ -15,9 +15,11 @@ const parse = (
   macros: { [name: string]: { args: number; body: string } };
   constants: { [name: string]: string };
 } => {
+  // Generate arrays containing all macros, constants, and tables.
   let [{ macros, constants }, { macros: orderedMacros, constants: orderedConstants }] =
     parseFile(path);
 
+  // Get an array of used storage pointers.
   const { macros: usedMacros, constants: usedConstants } = getUsedDefinitions(
     ["MAIN", "CONSTRUCTOR"],
     {
@@ -27,14 +29,14 @@ const parse = (
     }
   );
 
-  // Remove non-used functions
+  // Remove non-used functions.
   orderedMacros = removeNonMatching(orderedMacros, usedMacros);
   orderedConstants = removeNonMatching(orderedConstants, usedConstants);
 
-  // Set storage pointers
+  // Set the value of constants that use "FREE_MEMORY_POINTER()".
   setStoragePointerConstants(constants, orderedConstants);
 
-  // Return the data
+  // Return the data.
   return { macros, constants };
 };
 
