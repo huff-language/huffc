@@ -61,7 +61,7 @@ const getHighLevelDefinitions = (
         const macro = input.match(HIGH_LEVEL.MACRO);
 
         // macros[name] = {body, takes}
-        macros[macro[2]] = { body: macro[5], args: parseInt(macro[3]) };
+        macros[macro[2]] = { body: macro[7], args: parseInt(macro[3]) };
 
         // Add macro to macrosArray.
         macrosArray.push(macro[2]);

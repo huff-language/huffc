@@ -44,12 +44,12 @@ export const getUsedDefinitions = (
     while (!isEndOfData(body)) {
       // If the next call is a constant call.
       if (body.match(MACRO_CODE.CONSTANT_CALL)) {
-        const name = body.match(MACRO_CODE.CONSTANT_CALL)[1];
+        const constantName = body.match(MACRO_CODE.CONSTANT_CALL)[0].replace(" ", "");
 
-        if (data.constants[name] !== undefined) {
-          constants.push(name);
+        if (data.constants[constantName]) {
+          constants.push(constantName);
         } else {
-          throw `${name} is not defined`;
+          throw `${constantName} is not defined`;
         }
 
         body = body.slice(body.match(MACRO_CODE.CONSTANT_CALL)[0].length);
