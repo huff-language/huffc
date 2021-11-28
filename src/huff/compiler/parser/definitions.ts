@@ -16,7 +16,7 @@ import {
 export const getUsedDefinitions = (
   macrosToParse: string[],
   data: {
-    macros: { [name: string]: { takes: number; body: string } };
+    macros: { [name: string]: { args: number; body: string } };
     constants: { [name: string]: string };
     tables: { name: string; raw: string }[];
   }

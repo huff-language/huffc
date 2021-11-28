@@ -12,11 +12,12 @@ import { removeNonMatching } from "../../utils/helpers/data/bytes";
 const parse = (
   path: string
 ): {
-  macros: { [name: string]: { takes: number; body: string } };
+  macros: { [name: string]: { args: number; body: string } };
   constants: { [name: string]: string };
 } => {
   let [{ macros, constants }, { macros: orderedMacros, constants: orderedConstants }] =
     parseFile(path);
+
   const { macros: usedMacros, constants: usedConstants } = getUsedDefinitions(
     ["MAIN", "CONSTRUCTOR"],
     {

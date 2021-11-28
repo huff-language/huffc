@@ -13,7 +13,7 @@ const parseFile = (
   path: string
 ): [
   {
-    macros: { [name: string]: { takes: number; body: string } };
+    macros: { [name: string]: { args: number; body: string } };
     constants: { [name: string]: string };
     tables: { name: string; raw: string }[];
   },
@@ -29,14 +29,14 @@ const getHighLevelDefinitions = (
   data: { filename: string; data: string }[]
 ): [
   {
-    macros: { [name: string]: { takes: number; body: string } };
+    macros: { [name: string]: { args: number; body: string } };
     constants: { [name: string]: string };
     tables: { name: string; raw: string }[];
   },
   { macros: string[]; constants: string[] }
 ] => {
   // Dictionaries
-  const macros: { [name: string]: { takes: number; body: string } } = {};
+  const macros: { [name: string]: { args: number; body: string } } = {};
   const constants: { [name: string]: string } = {};
   const tables: { name: string; raw: string }[] = [];
 
@@ -61,7 +61,7 @@ const getHighLevelDefinitions = (
         const macro = input.match(HIGH_LEVEL.MACRO);
 
         // macros[name] = {body, takes}
-        macros[macro[2]] = { body: macro[5], takes: parseInt(macro[3]) };
+        macros[macro[2]] = { body: macro[5], args: parseInt(macro[3]) };
 
         // Add macro to macrosArray.
         macrosArray.push(macro[2]);
