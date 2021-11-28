@@ -11,3 +11,9 @@ export enum TokenType {
   CODESIZE = "CODESIZE",
   TABLE_START_POSITION = "TABLE_START_POSITION",
 }
+
+export type Definitions = {
+  macros: { [name: string]: { args: number; body: string } };
+  constants: { [name: string]: string };
+  tables: { name: string; raw: string }[];
+};
