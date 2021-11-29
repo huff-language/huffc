@@ -32,9 +32,9 @@ export const getHighLevelDefinitions = (
   data: { filename: string; data: string }[]
 ): [Definitions, { macros: string[]; constants: string[] }] => {
   // Dictionaries
-  const macros: { [name: string]: { args: string[]; body: string } } = {};
-  const constants: { [name: string]: string } = {};
-  const tables: { name: string; raw: string }[] = [];
+  const macros: Definitions["macros"] = {};
+  const constants: Definitions["constants"] = {};
+  const tables: Definitions["tables"] = [];
 
   /*
    * Arrays
@@ -59,7 +59,7 @@ export const getHighLevelDefinitions = (
         console.log(macro[3]);
         console.log(parseArgs(macro[3]));
 
-        // macros[name] = {body, takes}
+        // macros[name] = {body, args}
         macros[macro[2]] = { body: macro[7], args: parseArgs(macro[3]) };
 
         // Add macro to macrosArray.
