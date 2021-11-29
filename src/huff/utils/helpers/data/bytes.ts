@@ -1,3 +1,5 @@
+import BN = require("bn.js");
+
 /**
  * Convert a hex literal to a number
  * @param bytes A string representing a hex literal.
@@ -26,4 +28,21 @@ export const findLowest = (value: number, arr: number[]) => {
  */
 export const removeNonMatching = (arr1: any[], arr2: any[]) => {
   return arr1.filter((val) => arr2.includes(val));
+};
+
+/**
+ * Format a hex literal to make its length even
+ */
+export const formatEvenBytes = (bytes: string) => {
+  if (Math.floor(bytes.length / 2) * 2 !== bytes.length) {
+    return `0${bytes}`;
+  }
+  return bytes;
+};
+
+/**
+ * Convert a hex literal to a BigNumber
+ */
+export const toHex = (number: number): string => {
+  return new BN(number, 10).toString(16);
 };
