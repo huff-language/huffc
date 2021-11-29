@@ -227,6 +227,9 @@ export const MACRO_CODE = {
     "\\)\\s*\\n*",
   ]),
 
+  /* Syntax for template calls */
+  ARG_CALL: combineRegexElements(["^(?:[\\s\\n]*)<", "([a-zA-Z0-9_\\-\\+\\*]+)", ">\\s*\\n*"]),
+
   /* Syntax for jumptables */
   JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
 };

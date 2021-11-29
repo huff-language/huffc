@@ -6,7 +6,7 @@ export enum TokenType {
 
   MACRO_CALL = "MACRO_CALL",
   CONSTANT_CALL = "CONSTANT_CALL",
-  TEMPLATE_CALL = "TEMPLATE_CALL",
+  ARG_CALL = "ARG_CALL",
 
   CODESIZE = "CODESIZE",
   TABLE_START_POSITION = "TABLE_START_POSITION",
@@ -17,3 +17,5 @@ export type Definitions = {
   constants: { [name: string]: string };
   tables: { name: string; raw: string }[];
 };
+
+export type Token = { type: TokenType; name: string; args: string[]; ops?: Token[] };
