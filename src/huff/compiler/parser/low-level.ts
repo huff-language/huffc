@@ -8,6 +8,15 @@ import { MACRO_CODE } from "../../utils/langauge/syntax";
 /* Data Utils */
 import { formatEvenBytes, convertNumberToBytes, toHex } from "../../utils/helpers/data/bytes";
 
+const parseMacros = (toParse: string[], macros: Definitions["macros"]): Token[][] => {
+  const macroTokens: Token[][] = [];
+  toParse.forEach((macro) => {
+    macroTokens.push(macros[macro] ? parseMacro(macro, macros) : []);
+  });
+
+  return macroTokens;
+};
+
 /**
  * @param macro The name of the macro
  * @param macros Maps macros to their names, args, and raw code data
@@ -99,3 +108,5 @@ export const parseMacro = (macro: string, macros: Definitions["macros"]): Token[
 
   return tokens;
 };
+
+export default parseMacros;
