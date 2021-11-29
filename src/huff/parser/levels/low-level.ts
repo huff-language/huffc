@@ -97,7 +97,7 @@ export const parseMacro = (macro: string, macros: Definitions["macros"]): Token[
       const value = formatEvenBytes(token[1]);
 
       // Add the hex literal to the token list
-      tokens.push({ type: TokenType.PUSH, name: toHex(95 + value.length / 2), args: [] });
+      tokens.push({ type: TokenType.PUSH, name: toHex(95 + value.length / 2), args: [value] });
     } else {
       token[0] = " ";
     }

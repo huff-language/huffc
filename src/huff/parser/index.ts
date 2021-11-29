@@ -1,10 +1,10 @@
 /* Parser */
-import parseFile, { getUsedDefinitions, setStoragePointerConstants } from "./high-level";
-import parseMacros from "./low-level";
-import { Definitions, Token } from "../utils/enums";
+import parseFile, { getUsedDefinitions, setStoragePointerConstants } from "./levels/high-level";
+import parseMacros from "./levels/low-level";
+import { Definitions, Token } from "./utils/enums";
 
 /* Utils */
-import { removeNonMatching } from "../../utils/helpers/data/bytes";
+import { removeNonMatching } from "../utils/helpers/data/bytes";
 
 /**
  * Given a file, generate data to be compiled.
