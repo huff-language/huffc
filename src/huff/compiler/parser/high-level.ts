@@ -56,9 +56,6 @@ export const getHighLevelDefinitions = (
         // Parse macro definition.
         const macro = input.match(HIGH_LEVEL.MACRO);
 
-        console.log(macro[3]);
-        console.log(parseArgs(macro[3]));
-
         // macros[name] = {body, args}
         macros[macro[2]] = { body: macro[7], args: parseArgs(macro[3]) };
 
