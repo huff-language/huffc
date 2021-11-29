@@ -1,6 +1,7 @@
 /* Parser */
 import parseFile, { getUsedDefinitions, setStoragePointerConstants } from "./high-level";
-import { Definitions } from "../utils/enums";
+import parseMacros from "./low-level";
+import { Definitions, Token } from "../utils/enums";
 
 /* Utils */
 import { removeNonMatching } from "../../utils/helpers/data/bytes";
@@ -9,7 +10,7 @@ import { removeNonMatching } from "../../utils/helpers/data/bytes";
  * Given a file, generate data to be compiled.
  * @param path The file to parse.
  */
-const parse = (path: string): Definitions => {
+const parse = (path: string): Token[][] => {
   // Generate arrays containing all macros, constants, and tables.
   let [{ macros, constants }, { macros: orderedMacros, constants: orderedConstants }] =
     parseFile(path);
@@ -31,8 +32,8 @@ const parse = (path: string): Definitions => {
   // Set the value of constants that use "FREE_MEMORY_POINTER()".
   setStoragePointerConstants(constants, orderedConstants);
 
-  // Return the data.
-  return { macros, constants, tables: [] };
+  // Parse the constructor and main macros and return the output.
+  return parseMacros(["CONSTRUCTOR", "MAIN"], macros);
 };
 
 export default parse;
