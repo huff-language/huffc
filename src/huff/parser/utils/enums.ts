@@ -18,4 +18,9 @@ export type Definitions = {
   tables: { name: string; raw: string }[];
 };
 
-export type Token = { type: TokenType; name: string; args: string[]; ops?: Token[] };
+export type Token = {
+  type: TokenType;
+  name: string;
+  args: string[];
+  ops?: Token[];
+};

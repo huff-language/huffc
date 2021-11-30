@@ -20,15 +20,6 @@ export const HIGH_LEVEL = {
     "(?:\\\"|\\')",
   ]),
 
-  /* Syntax for templates */
-  TEMPLATE: combineRegexElements([
-    /* The word "template" at the start of the line */
-    "^(?:[\\s\\n]*)template",
-
-    /* Pair of brackets (<>) that can contain anything */
-    "\\<(.*)\\>",
-  ]),
-
   /* Syntax for macros */
   MACRO: combineRegexElements([
     /* "#define" at the start of the line */
