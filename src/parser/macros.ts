@@ -6,10 +6,10 @@ import { Definitions, Operation, OperationType } from "./utils/types";
 
 /**
  * Parse a macro definition.
+ * @param args The arguments passed into the macro.
  */
 const parseMacro = (
-  body: string,
-  args: string[],
+  macro: string,
   macros: Definitions["data"],
   jumptables: Definitions["data"]
 ): Operation[] => {
@@ -17,8 +17,9 @@ const parseMacro = (
   let operations: Operation[] = [];
   const jumpdests = {};
 
-  // Store a copy of the body.
-  let input = body;
+  // Store a copy of the body and args.
+  let input = macros[macro].value;
+  const args = macros[macro].args;
 
   // Loop through the body.
   while (!isEndOfData(input)) {
@@ -39,9 +40,7 @@ const parseMacro = (
         type: OperationType.MACRO_CALL,
         value: name,
         args: args,
-        ops: parseMacro(macros[name].value, args, macros, jumptables),
       });
-      operations = [...operations, ...parseMacro(macros[name].value, args, macros, jumptables)];
     }
     // Check if we're parsing a constant call.
     else if (input.match(MACRO_CODE.CONSTANT_CALL)) {
@@ -56,7 +55,7 @@ const parseMacro = (
     // Check if we're parsing an argument call
     else if (input.match(MACRO_CODE.ARG_CALL)) {
       // Parse a template call
-      token = body.match(MACRO_CODE.ARG_CALL);
+      token = input.match(MACRO_CODE.ARG_CALL);
       const name = token[1];
 
       // Verify that template has been defined
