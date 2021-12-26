@@ -59,6 +59,28 @@ export const HIGH_LEVEL = {
     "\\{((?:[^\\}])*)\\}",
   ]),
 
+  FUNCTION: combineRegexElements([
+    /* #function at the start of the line */
+    "^(?:[\\s\\n]*[\\s\\n]*#function)",
+
+    /**
+     * The function name and parameter types
+     * which is then turned into the function signature.
+     * For example "example(uint, bool)"
+     */
+    "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\)))",
+
+    /**
+     * The word "returns"
+     */
+    "(?:[\\s\\n]* returns)",
+
+    /**
+     * The return type of the function within parenthesis.
+     */
+    "(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\))",
+  ]),
+
   /* Syntax for constants */
   CONSTANT: combineRegexElements([
     /* "#define" at the start of the line */
