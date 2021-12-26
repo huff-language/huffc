@@ -157,7 +157,7 @@ export const HIGH_LEVEL = {
 /* Jump Table Syntax */
 export const JUMP_TABLES = {
   /* All characters, with any number of whitespace before and after */
-  jumps: new RegExp("(?:[\\s\\n]*)[a-zA-Z_0-9\\-]+(?:$|\\s+)", "g"),
+  JUMPS: new RegExp("(?:[\\s\\n]*)[a-zA-Z_0-9\\-]+(?:$|\\s+)", "g"),
 };
 
 /* Code Syntax, found within macros */
