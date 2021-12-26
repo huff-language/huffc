@@ -20,6 +20,13 @@ export const removeSpacesAndCommas = (input: string): string[] => {
 };
 
 /**
+ * Removes all spaces and newlines from a string
+ */
+export const removeSpacesAndLines = (input) => {
+  return input.replace(/(\r\n\t|\n|\r\t|\s)/gm, "");
+};
+
+/**
  * @returns A boolean indicating whether the input is the end of the data.
  */
 export const isEndOfData = (data: string): boolean => {
