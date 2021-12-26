@@ -9,14 +9,13 @@ import { Definitions, Operation, OperationType } from "./utils/types";
  */
 const parseMacro = (
   body: string,
-  name: string,
+  args: string[],
   macros: Definitions["data"],
   jumptables: Definitions["data"]
 ): Operation[] => {
   // Instantiate variables.
   let operations: Operation[] = [];
   const jumpdests = {};
-  const macroArgs = macros[name].args;
 
   // Store a copy of the body.
   let input = body;
@@ -36,7 +35,7 @@ const parseMacro = (
       if (!macros[name]) throw new Error("Macro does not exist.");
 
       // Add the macro's operations to the macro operations.
-      operations = [...operations, ...parseMacro(name, macros[name].value, macros, jumptables)];
+      operations = [...operations, ...parseMacro(macros[name].value, args, macros, jumptables)];
     }
     // Check if we're parsing a constant call.
     else if (input.match(MACRO_CODE.CONSTANT_CALL)) {
@@ -55,7 +54,7 @@ const parseMacro = (
       const name = token[1];
 
       // Verify that template has been defined
-      if (!macroArgs[name]) throw new Error(`Arg ${name} is not defined`);
+      if (!args[name]) throw new Error(`Arg ${name} is not defined`);
 
       // Add the template call to the token list
       operations.push({ type: OperationType.ARG_CALL, value: name, args: [] });
@@ -144,3 +143,5 @@ const parseMacro = (
 
   return operations;
 };
+
+export default parseMacro;
