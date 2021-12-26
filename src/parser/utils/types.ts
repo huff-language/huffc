@@ -1,6 +1,6 @@
 /* Type Representing Defintions */
 export type Definitions = {
-  data: { [name: string]: { args: any[]; value: string; data?: any } };
+  data: { [name: string]: { args: any[]; value: string; data?: any[] } };
   defintions: string[];
 };
 
@@ -9,7 +9,6 @@ export type Operation = {
   type: OperationType;
   value: string;
   args: any[];
-  ops?: Operation[];
 };
 
 /* Operation Type */
