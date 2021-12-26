@@ -7,6 +7,7 @@ import { parseArgs, getLineNumber } from "./utils/parsing";
 
 import { keccak256 } from "ethers/lib/utils";
 import { parseCodeTable, parseJumpTable } from "./tables";
+import parseMacro from "./macros";
 
 /**
  * Parse a file, storing the definitions of all constants, macros, and tables.
@@ -41,6 +42,9 @@ const parseFile = (
 
         // macros[name] = body, args.
         macros.data[macro[2]] = { value: macro[3], args: parseArgs(macro[3]) };
+
+        // Parse the macro.
+        macros.data[macro[2]].data = parseMacro(macro[3], [], macros.data, tables.data);
 
         // Slice the input
         input = input.slice(macro[0].length);
