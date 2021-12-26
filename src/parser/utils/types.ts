@@ -1,5 +1,5 @@
 /* Type Representing Defintions */
-export type Defintions = {
+export type Definitions = {
   data: { [name: string]: { args: string[]; value: string } };
   defintions: string[];
 };
