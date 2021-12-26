@@ -1,8 +1,8 @@
 /* Imports */
 
-import { HIGH_LEVEL } from "./syntax/defintions";
-import { removeComments } from "./utils/parsing";
-import { readFile } from "../utils/files";
+import { HIGH_LEVEL } from "../syntax/defintions";
+import { removeComments } from "./parsing";
+import { readFile } from "../../utils/files";
 
 /**
  * Given a file path, return a string containing the raw
