@@ -5,7 +5,7 @@ import { Definitions } from "./utils/types";
 import { HIGH_LEVEL } from "./syntax/defintions";
 import { parseArgs, getLineNumber } from "./utils/parsing";
 
-import { keccak256 } from "ethers/lib/utils";
+import { solidityKeccak256, keccak256, arrayify } from "ethers/lib/utils";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
 
@@ -13,7 +13,7 @@ import parseMacro from "./macros";
  * Parse a file, storing the definitions of all constants, macros, and tables.
  * @param filePath The path to the file to parse.
  */
-const parseFile = (
+export const parseFile = (
   filePath: string
 ): { macros: Definitions; constants: Definitions; functions: Definitions; tables: Definitions } => {
   // Get an array of file contents.
@@ -41,10 +41,10 @@ const parseFile = (
         macros.defintions.push(macro[2]);
 
         // macros[name] = body, args.
-        macros.data[macro[2]] = { value: macro[3], args: parseArgs(macro[3]) };
+        macros.data[macro[2]] = { value: macro[7], args: parseArgs(macro[3]) };
 
         // Parse the macro.
-        macros.data[macro[2]].data = parseMacro(macro[3], [], macros.data, tables.data);
+        macros.data[macro[2]].data = parseMacro(macro[7], [], macros.data, tables.data);
 
         // Slice the input
         input = input.slice(macro[0].length);
@@ -74,11 +74,13 @@ const parseFile = (
         // Calculate the hash of the function definition and store the first 4 bytes.
         // This is the signature of the function.
         const name = functionDef[1];
-        const hash = keccak256(name).substring(0, 8);
+        const hash = solidityKeccak256(["string"], [name]).substring(0, 8);
+
+        console.log(hash);
 
         // Store the function definition.
         functions.defintions.push(name);
-        functions.data[name] = { value: hash, args: parseArgs(functionDef[3]) };
+        functions.data[name] = { value: hash, args: parseArgs(functionDef[4]) };
 
         // Slice the input.
         input = input.slice(functionDef[0].length);
