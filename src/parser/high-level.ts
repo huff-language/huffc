@@ -44,7 +44,7 @@ export const parseFile = (
         macros.data[macro[2]] = { value: macro[7], args: parseArgs(macro[3]) };
 
         // Parse the macro.
-        macros.data[macro[2]].data = parseMacro(macro[7], [], macros.data, tables.data);
+        macros.data[macro[2]].data = parseMacro(macro[2], macros.data, tables.data);
 
         // Slice the input
         input = input.slice(macro[0].length);
