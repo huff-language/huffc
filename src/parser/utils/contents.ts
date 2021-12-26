@@ -65,3 +65,5 @@ const getImports = (contents: string) => {
 
   return imports;
 };
+
+export default getAllFileContents;
