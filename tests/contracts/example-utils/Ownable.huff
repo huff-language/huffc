@@ -1,3 +1,0 @@
-#define macro OWNER_LOCATION = takes(0) returns(1) {
-    0x00
-}
