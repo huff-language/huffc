@@ -35,6 +35,12 @@ const parseMacro = (
       if (!macros[name]) throw new Error("Macro does not exist.");
 
       // Add the macro's operations to the macro operations.
+      operations.push({
+        type: OperationType.MACRO_CALL,
+        value: name,
+        args: args,
+        ops: parseMacro(macros[name].value, args, macros, jumptables),
+      });
       operations = [...operations, ...parseMacro(macros[name].value, args, macros, jumptables)];
     }
     // Check if we're parsing a constant call.
