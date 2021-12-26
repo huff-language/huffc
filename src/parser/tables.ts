@@ -1,4 +1,4 @@
-import { HIGH_LEVEL, JUMP_TABLES } from "./syntax/defintions";
+import { JUMP_TABLES } from "./syntax/defintions";
 import { removeSpacesAndLines } from "./utils/regex";
 
 /**
