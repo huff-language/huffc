@@ -69,3 +69,10 @@ export const removeComments = (data: string): string => {
 export const getLineNumber = (str: string, index: number): number => {
   return str.substr(0, index).split("\n").length;
 };
+
+/**
+ * Parse an arguments list and convert it to an array
+ */
+const parseArgs = (argString) => {
+  return argString.replace(" ", "").split(",");
+};
