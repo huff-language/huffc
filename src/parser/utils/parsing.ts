@@ -76,3 +76,16 @@ export const getLineNumber = (str: string, index: number): number => {
 export const parseArgs = (argString) => {
   return argString.replace(" ", "").split(",");
 };
+
+/**
+ * Throw errors
+ */
+export const throwErrors = (errors: string[]) => {
+  if (errors.length > 0) {
+    errors.map((error) => {
+      console.log(error);
+    });
+
+    throw new Error("");
+  }
+};
