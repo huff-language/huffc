@@ -44,7 +44,7 @@ export const parseFile = (
         macros.data[macro[2]] = { value: macro[7], args: parseArgs(macro[3]) };
 
         // Parse the macro.
-        macros.data[macro[2]].data = parseMacro(macro[2], macros.data, tables.data);
+        macros.data[macro[2]].data = parseMacro(macro[2], macros.data, constants.data, tables.data);
 
         // Slice the input
         input = input.slice(macro[0].length);
@@ -54,7 +54,7 @@ export const parseFile = (
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
         const name = constant[2];
-        const value = constant[3];
+        const value = constant[3].substring(2);
 
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name) throw new Error(`Constant ${name} is not uppercase`);
@@ -75,8 +75,6 @@ export const parseFile = (
         // This is the signature of the function.
         const name = functionDef[1];
         const hash = solidityKeccak256(["string"], [name]).substring(0, 8);
-
-        console.log(hash);
 
         // Store the function definition.
         functions.defintions.push(name);
