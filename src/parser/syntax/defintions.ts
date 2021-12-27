@@ -177,7 +177,7 @@ export const MACRO_CODE = {
     "(?:<([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)>)?",
 
     /* Parenthesis at the end of the macro call */
-    "(?:\\(\\))",
+    "(?:\\(([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)\\))",
   ]),
 
   /* Syntax for constant calls */
@@ -241,7 +241,7 @@ export const MACRO_CODE = {
   ]),
 
   /* Syntax for template calls */
-  ARG_CALL: combineRegexElements(["^(?:[\\s\\n]*)<", "([a-zA-Z0-9_\\-\\+\\*]+)", ">\\s*\\n*"]),
+  ARG_CALL: combineRegexElements(["^(?:[\\s\\n]*)", "<([a-zA-Z0-9_\\-\\+\\*]+)>", "\\s*\\n*"]),
 
   /* Syntax for jumptables */
   JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
