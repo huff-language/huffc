@@ -1,7 +1,7 @@
 import opcodes from "../evm/opcodes";
 import { formatEvenBytes, toHex } from "../utils/bytes";
-import { MACRO_CODE } from "./syntax/defintions";
-import { isEndOfData } from "./utils/regex";
+import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
+import { isEndOfData, isLiteral } from "./utils/regex";
 import { Definitions, Operation, OperationType } from "./utils/types";
 
 /**
@@ -11,6 +11,7 @@ import { Definitions, Operation, OperationType } from "./utils/types";
 const parseMacro = (
   macro: string,
   macros: Definitions["data"],
+  constants: Definitions["data"],
   jumptables: Definitions["data"]
 ): Operation[] => {
   // Instantiate variables.
@@ -26,11 +27,16 @@ const parseMacro = (
     let token: string[];
 
     // Check if we're parsing a macro call.
-    if (input.match(MACRO_CODE.MACRO_CALL)) {
+    if (
+      input.match(MACRO_CODE.MACRO_CALL) &&
+      !(input.match(MACRO_CODE.MACRO_CALL) ? input.match(MACRO_CODE.MACRO_CALL)[1] : "").startsWith(
+        "__"
+      )
+    ) {
       // Parse the macro call.
       token = input.match(MACRO_CODE.MACRO_CALL);
       const name = token[1];
-      const args = token[2] ? [token[2]] : [];
+      const args = token[3] ? [token[3]] : [];
 
       // Ensure the macro exists.
       if (!macros[name]) throw new Error("Macro does not exist.");
@@ -59,7 +65,7 @@ const parseMacro = (
       const name = token[1];
 
       // Verify that template has been defined
-      if (!args[name]) throw new Error(`Arg ${name} is not defined`);
+      if (!args.includes(name)) throw new Error(`Arg ${name} is not defined`);
 
       // Add the template call to the token list
       operations.push({ type: OperationType.ARG_CALL, value: name, args: [] });
@@ -101,7 +107,10 @@ const parseMacro = (
     }
 
     // Check if we're parsing a jumplabel.
-    else if (input.match(MACRO_CODE.JUMP_LABEL)) {
+    else if (
+      input.match(MACRO_CODE.JUMP_LABEL) &&
+      !constants[input.match(MACRO_CODE.JUMP_LABEL)[1]]
+    ) {
       // Parse the jump label.
       token = input.match(MACRO_CODE.JUMP_LABEL);
 
@@ -128,7 +137,7 @@ const parseMacro = (
     }
 
     // Check if we're parsing an opcode.
-    else if (input.match(MACRO_CODE.TOKEN)) {
+    else if (input.match(MACRO_CODE.TOKEN) && !constants[input.match(MACRO_CODE.TOKEN)[1]]) {
       // Parse the macro.
       token = input.match(MACRO_CODE.TOKEN);
 
