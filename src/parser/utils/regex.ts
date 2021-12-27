@@ -57,14 +57,9 @@ export const containsOperators = (input: string) => {
  * @returns A boolean indicating whether the input is a valid literal.
  */
 export const isLiteral = (input) => {
-  if (containsOperators(input)) {
-    return true;
-  }
   if (input.match(new RegExp("^(?:\\s*\\n*)*0x([0-9a-fA-F]+)\\b"))) {
     return true;
   }
-  if (input.match(new RegExp("^(?:\\s*\\n*)*(\\d+)\\b"))) {
-    return true;
-  }
+
   return false;
 };
