@@ -183,7 +183,7 @@ export const MACRO_CODE = {
   /* Syntax for constant calls */
   CONSTANT_CALL: combineRegexElements([
     /* Any number of alphanumeric characters + underscores */
-    "^([A-Z0-9_]+ )",
+    "^(?:[\\s\\n]*)\\[([A-Z0-9_]+)\\]",
   ]),
 
   /* Syntax for the builtin codesize function */
