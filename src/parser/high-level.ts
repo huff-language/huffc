@@ -121,7 +121,11 @@ export const parseFile = (
 
         // Store the table definition.
         tables.defintions.push(table[2]);
-        tables.data[table[2]] = { value: body, args: [parsed.jumps, parsed.size] };
+        tables.data[table[2]] = {
+          value: body,
+          args: [parsed.jumps, parsed.size],
+          data: [table[2], true],
+        };
 
         // Slice the input.
         input = input.slice(table[0].length);
@@ -148,7 +152,11 @@ export const parseFile = (
 
         // Store the table definition.
         tables.defintions.push(table[2]);
-        tables.data[table[2]] = { value: body, args: [parsed.jumps, parsed.size] };
+        tables.data[table[2]] = {
+          value: body,
+          args: [parsed.jumps, parsed.size],
+          data: [table[2], false],
+        };
 
         // Slice the input.
         input = input.slice(table[0].length);
