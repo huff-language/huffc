@@ -147,7 +147,7 @@ export const processMacro = (
       // We're parsing a table start position call.
       case OperationType.TABLE_START_POSITION: {
         // Add to the tableInstances.
-        tableInstances.push({ lable: operation.value, bytecodeIndex: offset });
+        tableInstances.push({ label: operation.value, bytecodeIndex: offset });
 
         // Add to the offset.
         offset += 3;
@@ -185,6 +185,9 @@ export const processMacro = (
     return currentIndex;
   });
 
+  // Add the initial index to the start of the array.
+  indices.unshift(0);
+
   // Store an array of unmatched jumps.
   const unmatchedJumps = [];
 
@@ -210,24 +213,24 @@ export const processMacro = (
           const after = formattedBytecode.slice(bytecodeIndex + 6);
 
           // Ensure that the jump value is set with a placeholder.
-          if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== "xxxx") {
+          if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== "xxxx")
             throw new Error(
               `Expected indicies ${bytecodeIndex + 2} to ${
                 bytecodeIndex + 6
               } to be jump location, of
                           ${formattedBytecode}`
             );
-            // Insert the jump value.
-            formattedBytecode = `${before}${jumpvalue}${after}`;
-          }
-          // If the jumplabel has not been definied:
-          else {
-            // Store the offset.
-            const jumpOffset = (indices[index] - bytecodeOffset) * 2;
 
-            // Push the jump value to the unmatched jumps array.
-            unmatchedJumps.push({ label: jumplabel, bytecodeIndex: jumpOffset + bytecodeIndex });
-          }
+          // Insert the jump value.
+          formattedBytecode = `${before}${jumpvalue}${after}`;
+        }
+        // If the jumplabel has not been definied:
+        else {
+          // Store the offset.
+          const jumpOffset = (indices[index] - bytecodeOffset) * 2;
+
+          // Push the jump value to the unmatched jumps array.
+          unmatchedJumps.push({ label: jumplabel, bytecodeIndex: jumpOffset + bytecodeIndex });
         }
       }
     }
@@ -235,8 +238,6 @@ export const processMacro = (
     // Return the new bytecode.
     return accumulator + formattedBytecode;
   }, "");
-
-  // Add the initial index to the start of the array.
 
   // Return the result.
   return { bytecode: codes.join(""), unmatchedJumps, tableInstances, jumptable, jumpindices };
