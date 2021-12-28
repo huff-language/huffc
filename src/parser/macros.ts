@@ -117,11 +117,11 @@ const parseMacro = (
       // Ensure the label has not been defined.
       if (jumpdests[token[1]]) throw new Error(`Jump label ${token[1]} has already been defined`);
 
-      // Add the jump label to the token list.
-      operations.push({ type: OperationType.PUSH_JUMP_LABEL, value: token[1], args: [] });
-
       // Define the jump label.
       jumpdests[token[1]] = true;
+
+      // Add the jump label to the token list.
+      operations.push({ type: OperationType.JUMPDEST, value: token[1], args: [] });
     }
 
     // Check if we're parsing a literal.
