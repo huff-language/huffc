@@ -71,6 +71,11 @@ export const HIGH_LEVEL = {
     "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\)))",
 
     /**
+     * The function type (payable, nonpayable, view, pure).
+     */
+    "(payable|nonpayable|view|pure)",
+
+    /**
      * The word "returns"
      */
     "(?:[\\s\\n]* returns)",
