@@ -1,6 +1,0 @@
-{
-  "testData/external.huff": "#include './add-three.huff'",
-  "add/two.huff": "#define macro ADD_TWO = takes(0) returns(1) { 0x02 add }",
-  "add/one.huff": "#define macro ADD_ONE = takes(0) returns(1) { 0x01 add }",
-  "test.huff": "#include './add/one.huff'"
-}
