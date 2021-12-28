@@ -1,6 +1,7 @@
 import opcodes from "../evm/opcodes";
 import { formatEvenBytes, toHex } from "../utils/bytes";
 import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
+import { parseArgs } from "./utils/parsing";
 import { isEndOfData, isLiteral } from "./utils/regex";
 import { Definitions, Operation, OperationType } from "./utils/types";
 
@@ -36,7 +37,7 @@ const parseMacro = (
       // Parse the macro call.
       token = input.match(MACRO_CODE.MACRO_CALL);
       const name = token[1];
-      const args = token[3] ? [token[3]] : [];
+      const args = token[3] ? parseArgs(token[3]) : [];
 
       // Ensure the macro exists.
       if (!macros[name]) throw new Error("Macro does not exist.");
@@ -48,6 +49,7 @@ const parseMacro = (
         args: args,
       });
     }
+
     // Check if we're parsing a constant call.
     else if (input.match(MACRO_CODE.CONSTANT_CALL)) {
       // Parse the constant call.
@@ -156,6 +158,68 @@ const parseMacro = (
   }
 
   return operations;
+};
+
+/** Parse argument */
+export const parseArgument = (
+  input: string,
+  macros: Definitions["data"],
+  constants: Definitions["data"]
+): Definitions["data"] => {
+  // If the input is a hex literal:
+  if (isLiteral(input)) {
+    // Get the bytes value of the operation.
+    const value = input.substring(2);
+
+    // Get the push value
+    const push = toHex(95 + value.length / 2);
+
+    // Return a macro map with a single macro containing a push operation.
+    return {
+      [input]: {
+        value: "",
+        args: [],
+        data: [{ type: OperationType.PUSH, value: push, args: [value] }],
+      },
+    };
+  }
+  // If the input is an opcode:
+  else if (opcodes[input]) {
+    // Return a macro map with a single macro contraining an opcode.
+    return {
+      [input]: {
+        value: "",
+        args: [],
+        data: [{ type: OperationType.OPCODE, value: input, args: [] }],
+      },
+    };
+  }
+
+  // If the input is a macro, return the macros map.
+  if (macros[input]) return macros;
+
+  // If the input is a constant:
+  if (constants[input]) {
+    // Return a macro map with a single macro containing a constant call.
+    return {
+      [input]: {
+        value: "",
+        args: [],
+        data: [{ type: OperationType.CONSTANT_CALL, value: input, args: [] }],
+      },
+    };
+  }
+
+  // If the input is a jump label:
+  else {
+    return {
+      [input]: {
+        value: "",
+        args: [],
+        data: [{ type: OperationType.PUSH_JUMP_LABEL, value: input, args: [] }],
+      },
+    };
+  }
 };
 
 export default parseMacro;
