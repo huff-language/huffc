@@ -73,12 +73,17 @@ export const parseFile = (
 
         // Calculate the hash of the function definition and store the first 4 bytes.
         // This is the signature of the function.
-        const name = functionDef[1];
-        const hash = solidityKeccak256(["string"], [name]).substring(0, 8);
+        const name = functionDef[2];
+
+        // Store the function values.
+        const definition = {
+          inputs: parseArgs(functionDef[3]),
+          outputs: parseArgs(functionDef[5]),
+          type: functionDef[4],
+        };
 
         // Store the function definition.
-        functions.defintions.push(name);
-        functions.data[name] = { value: hash, args: parseArgs(functionDef[4]) };
+        functions.data[name] = { value: name, args: [], data: definition };
 
         // Slice the input.
         input = input.slice(functionDef[0].length);
