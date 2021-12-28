@@ -46,3 +46,17 @@ export const formatEvenBytes = (bytes: string) => {
 export const toHex = (number: number): string => {
   return new BN(number, 10).toString(16);
 };
+
+/**
+ * Pad a hex value with zeroes.
+ */
+export const padNBytes = (hex, numBytes) => {
+  if (hex.length > numBytes * 2) {
+    throw new Error(`value ${hex} has more than ${numBytes} bytes!`);
+  }
+  let result = hex;
+  while (result.length < numBytes * 2) {
+    result = `0${result}`;
+  }
+  return result;
+};
