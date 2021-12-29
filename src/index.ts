@@ -9,7 +9,7 @@ import { ethers } from "../tests/huff/node_modules/ethers/lib";
  * @param args An array containing the arguments to the macro.
  * @returns The compiled bytecode.
  */
-const compile = (filePath: string, args: [{ type: string; value: string }]) => {
+const compile = (filePath: string, args: { type: string; value: string }[]) => {
   // Parse the file and generate definitions.
   const { macros, constants, functions, tables } = parseFile(filePath);
 
@@ -17,14 +17,12 @@ const compile = (filePath: string, args: [{ type: string; value: string }]) => {
   constants.data = setStoragePointerConstants(["CONSTRUCTOR", "MAIN"], macros.data, constants);
 
   // Compile the macros.
-  const mainBytecode = compileMacro("MAIN", [], macros.data, constants.data, tables.data);
-  const constructorBytecode = compileMacro(
-    "CONSTRUCTOR",
-    [],
-    macros.data,
-    constants.data,
-    tables.data
-  );
+  const mainBytecode = macros["MAIN"]
+    ? compileMacro("MAIN", [], macros.data, constants.data, tables.data)
+    : "";
+  const constructorBytecode = macros["CONSTRUCTORS"]
+    ? compileMacro("CONSTRUCTOR", [], macros.data, constants.data, tables.data)
+    : "";
 
   // Store the sizes of the bytecode.
   const contractLength = mainBytecode.length / 2;
@@ -51,7 +49,7 @@ const compile = (filePath: string, args: [{ type: string; value: string }]) => {
  * @param args The arguments to encode.
  * @returns The encoded arguments.
  */
-function encodeArgs(args: [{ type: string; value: string }]): string {
+function encodeArgs(args: { type: string; value: string }[]): string {
   // Instantiate two arrays.
   const types: string[] = [];
   const values: string[] = [];
@@ -66,3 +64,6 @@ function encodeArgs(args: [{ type: string; value: string }]): string {
   const abiCoder = new ethers.utils.AbiCoder();
   return abiCoder.encode(types, values).replace(/^(0x)/, "");
 }
+
+// Export compiler function as default.
+export default compile;
