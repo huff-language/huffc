@@ -1,7 +1,7 @@
 import { padNBytes, toHex } from "./utils/bytes";
 import { compileMacro } from "./compiler/compiler";
 import { parseFile, setStoragePointerConstants } from "./parser/high-level";
-import { ethers } from "../tests/huff/node_modules/ethers/lib";
+import { ethers } from "ethers";
 import { generateAbi } from "./output";
 
 /**
