@@ -74,7 +74,7 @@ export const getLineNumber = (str: string, index: number): number => {
  * Parse an arguments list and convert it to an array
  */
 export const parseArgs = (argString: string) => {
-  return argString.replace(" ", "").split(",");
+  return argString.replace(" ", "").replace(" ", "").split(",");
 };
 
 /**

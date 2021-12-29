@@ -2,12 +2,13 @@ import getAllFileContents from "./utils/contents";
 
 import { isEndOfData } from "./utils/regex";
 import { Definitions } from "./utils/types";
-import { HIGH_LEVEL } from "./syntax/defintions";
+import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
 import { parseArgs, getLineNumber } from "./utils/parsing";
 
 import { solidityKeccak256, keccak256, arrayify } from "ethers/lib/utils";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
+import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils/bytes";
 
 /**
  * Parse a file, storing the definitions of all constants, macros, and tables.
@@ -15,16 +16,24 @@ import parseMacro from "./macros";
  */
 export const parseFile = (
   filePath: string
-): { macros: Definitions; constants: Definitions; functions: Definitions; tables: Definitions } => {
+): {
+  macros: Definitions;
+  constants: Definitions;
+  functions: Definitions["data"];
+  events: Definitions["data"];
+  tables: Definitions;
+} => {
   // Get an array of file contents.
   const contents: string[] = getAllFileContents(filePath);
 
-  // Set variables.
+  // Set defintion variables.
   const macros: Definitions = { data: {}, defintions: [] };
   const constants: Definitions = { data: {}, defintions: [] };
-  const functions: Definitions = { data: {}, defintions: [] };
   const tables: Definitions = { data: {}, defintions: [] };
 
+  // Set output variables.
+  const functions: Definitions["data"] = {};
+  const events: Definitions["data"] = {};
   const errors = [];
 
   // Parse the file contents.
@@ -54,7 +63,7 @@ export const parseFile = (
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
         const name = constant[2];
-        const value = constant[3].substring(2);
+        const value = constant[3].replace("0x", "");
 
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name) throw new Error(`Constant ${name} is not uppercase`);
@@ -73,15 +82,38 @@ export const parseFile = (
 
         // Calculate the hash of the function definition and store the first 4 bytes.
         // This is the signature of the function.
-        const name = functionDef[1];
-        const hash = solidityKeccak256(["string"], [name]).substring(0, 8);
+        const name = functionDef[2];
+
+        // Store the function values.
+        const definition = {
+          inputs: parseArgs(functionDef[3]),
+          outputs: parseArgs(functionDef[5]),
+          type: functionDef[4],
+        };
 
         // Store the function definition.
-        functions.defintions.push(name);
-        functions.data[name] = { value: hash, args: parseArgs(functionDef[4]) };
+        functions[name] = { value: name, args: [], data: definition };
 
         // Slice the input.
         input = input.slice(functionDef[0].length);
+      }
+      // Check if we're parsing an event defintion.
+      else if (HIGH_LEVEL.EVENT.test(input)) {
+        // Parse the event definition.
+        const eventDef = input.match(HIGH_LEVEL.EVENT);
+
+        // Calculate the hash of the event definition and store the first 4 bytes.
+        // This is the signature of the event.
+        const name = eventDef[2];
+
+        // Store the args.
+        const args = parseArgs(eventDef[3]).map((arg) => arg.replace("indexed", " indexed"));
+
+        // Store the event definition.
+        events[name] = { value: name, args };
+
+        // Slice the input.
+        input = input.slice(eventDef[0].length);
       }
       // Check if we're parsing a code table definition.
       else if (HIGH_LEVEL.CODE_TABLE.test(input)) {
@@ -173,5 +205,131 @@ export const parseFile = (
   });
 
   // Return all values
-  return { macros, constants, functions, tables };
+  return { macros, constants, functions, events, tables };
+};
+
+export const setStoragePointerConstants = (
+  macrosToSearch: string[],
+  macros: Definitions["data"],
+  constants: Definitions
+) => {
+  // Generate an array of all storage pointer constants
+  const storagePointerConstants = constants.defintions.filter((constant: string) => {
+    return constants.data[constant].value.startsWith("FREE_STORAGE_POINTER");
+  });
+
+  // Array of used storage pointer constants.
+  const usedStoragePointerConstants = [];
+
+  // Define a functinon that iterates over all macros and adds the storage pointer constants.
+  const getUsedStoragePointerConstants = (name: string, revertIfNonExistant: boolean) => {
+    // Store macro.
+    const macro = macros[name];
+
+    // Check if the macro exists.
+    if (!macro) {
+      // Check if we should revert (and revert).
+      if (revertIfNonExistant) throw new Error(`Macro ${name} does not exist`);
+
+      // Otherwise just return.
+      return;
+    }
+
+    // Store the macro body.
+    let body = macros[name].value;
+
+    while (!isEndOfData(body)) {
+      // If the next call is a constant call.
+      if (body.match(MACRO_CODE.CONSTANT_CALL)) {
+        // Store the constant definition.
+        const definition = body.match(MACRO_CODE.CONSTANT_CALL);
+        const constantName = definition[1];
+
+        // Push the array to the usedStoragePointerConstants array.
+        if (
+          constants.data[constantName].value === "FREE_STORAGE_POINTER()" &&
+          !usedStoragePointerConstants.includes(constantName)
+        ) {
+          usedStoragePointerConstants.push(constantName);
+        }
+
+        // Slice the body.
+        body = body.slice(definition[0].length);
+      }
+      // If the next call is a macro call.
+      else if (body.match(MACRO_CODE.MACRO_CALL)) {
+        // Store the macro definition.
+        const definition = body.match(MACRO_CODE.MACRO_CALL);
+        const macroName = definition[1];
+
+        // Get the used storage pointer constants.
+        getUsedStoragePointerConstants(macroName, true);
+
+        // Slice the body.
+        body = body.slice(definition[0].length);
+      }
+      // Otherwise just slice the body by one.
+      else {
+        body = body.slice(1);
+      }
+    }
+  };
+
+  // Loop through the given macros and generate the used storage pointer constants.
+  macrosToSearch.forEach((macroName) => {
+    getUsedStoragePointerConstants(macroName, false);
+  });
+
+  // Iterate through the ordered pointers and generate
+  // an array (ordered by the defined order) of all storage pointer constants.
+  const orderedStoragePointerConstants = constants.defintions.filter((constant: string) =>
+    usedStoragePointerConstants.includes(constant)
+  );
+
+  // Update and return the constants map.
+  return setStoragePointers(constants.data, orderedStoragePointerConstants);
+};
+
+/**
+ * Assign constants that use the builtin FREE_STORAGE_POINTER(
+ * @param constants Maps the name of constants to their values
+ * @param order The order that the constants were declared in
+ */
+export const setStoragePointers = (constants: Definitions["data"], order: string[]) => {
+  const usedPointers: number[] = [];
+
+  // Iterate over the array of constants.
+  order.forEach((name) => {
+    const value = constants[name].value;
+
+    // If the value is a hex literal.
+    if (!value.startsWith("FREE_")) {
+      /* 
+        If the pointer is already used, throw an error.
+        In order to safely circumvent this, all constant-defined pointers must be defined before
+        pointers that use FREE_STORAGE_POINTER.
+        */
+      if (usedPointers.includes(convertBytesToNumber(value))) {
+        throw `Constant ${name} uses already existing pointer`;
+      }
+
+      // Add the pointer to the list of used pointers.
+      usedPointers.push(convertBytesToNumber(value));
+    }
+
+    // The value calls FREE_STORAGE_POINTER.
+    else if (value == "FREE_STORAGE_POINTER()") {
+      // Find the lowest available pointer value.
+      const pointer = findLowest(0, usedPointers);
+
+      // Add the pointer to the list of used pointers.
+      usedPointers.push(pointer);
+
+      // Set the constant to the pointer value.
+      constants[name].value = convertNumberToBytes(pointer).replace("0x", "");
+    }
+  });
+
+  // Return the new constants value.
+  return constants;
 };

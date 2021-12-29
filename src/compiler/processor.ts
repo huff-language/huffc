@@ -1,4 +1,5 @@
 import opcodes from "../evm/opcodes";
+import { parseArgument } from "../parser/macros";
 import { Definitions, Operation, OperationType } from "../parser/utils/types";
 import { formatEvenBytes, padNBytes, toHex } from "../utils/bytes";
 
@@ -57,7 +58,7 @@ export const processMacro = (
         jumpindices = { ...jumpindices, ...result.jumpindices };
 
         // Add to the offset.
-        offset += result.bytecode.length;
+        offset += result.bytecode.length / 2;
 
         // Return the result.
         return result.bytecode;
@@ -78,17 +79,27 @@ export const processMacro = (
       }
       // We're parsing an argument call.
       case OperationType.ARG_CALL: {
-        // Get the bytes value of the operation.
-        const value = params[operation.value].substring(2);
+        // Get the value of the argument.
+        const arg = params[operation.value];
 
-        // Get the push value
-        const push = `${toHex(95 + value.length / 2)}${value}`;
+        // Parse the arguments.
+        const result = processMacro(
+          arg,
+          offset,
+          operation.args,
+          parseArgument(arg, macros, constants),
+          constants,
+          jumptables
+        );
+
+        // Set the jumplabels to the macro's unmatched jumps.
+        jumptable[index] = result.unmatchedJumps;
 
         // Add to the offset.
-        offset += push.length / 2;
+        offset += result.bytecode.length / 2;
 
         // Return the bytecode
-        return push;
+        return result.bytecode;
       }
       // We're parsing an opcodes.
       case OperationType.OPCODE: {
@@ -174,7 +185,7 @@ export const processMacro = (
   });
 
   // Store the current index.
-  let currentIndex = 0;
+  let currentIndex = bytecodeOffset;
 
   // Loop through the code definitions.
   const indices = codes.map((bytecode) => {
@@ -186,13 +197,13 @@ export const processMacro = (
   });
 
   // Add the initial index to the start of the array.
-  indices.unshift(0);
+  indices.unshift(bytecodeOffset);
 
   // Store an array of unmatched jumps.
   const unmatchedJumps = [];
 
   // Get the absolute bytecode index for each jump label.
-  const data = codes.reduce((accumulator, bytecode, index) => {
+  const newBytecode = codes.reduce((accumulator, bytecode, index) => {
     // Store a formatted version of the bytecode.
     let formattedBytecode = bytecode;
 
@@ -240,5 +251,5 @@ export const processMacro = (
   }, "");
 
   // Return the result.
-  return { bytecode: codes.join(""), unmatchedJumps, tableInstances, jumptable, jumpindices };
+  return { bytecode: newBytecode, unmatchedJumps, tableInstances, jumptable, jumpindices };
 };

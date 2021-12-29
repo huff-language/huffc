@@ -60,8 +60,8 @@ export const HIGH_LEVEL = {
   ]),
 
   FUNCTION: combineRegexElements([
-    /* #function at the start of the line */
-    "^(?:[\\s\\n]*[\\s\\n]*#function)",
+    /* #define event at the start of the line */
+    "^(?:[\\s\\n]*[\\s\\n]*#define function)",
 
     /**
      * The function name and parameter types
@@ -69,6 +69,11 @@ export const HIGH_LEVEL = {
      * For example "example(uint, bool)"
      */
     "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\)))",
+
+    /**
+     * The function type (payable, nonpayable, view, pure).
+     */
+    "(payable|nonpayable|view|pure)",
 
     /**
      * The word "returns"
@@ -79,6 +84,18 @@ export const HIGH_LEVEL = {
      * The return type of the function within parenthesis.
      */
     "(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\))",
+  ]),
+
+  EVENT: combineRegexElements([
+    /* #define event at the start of the line */
+    "^(?:[\\s\\n]*[\\s\\n]*#define event)",
+
+    /**
+     * The event name and parameter types
+     * which is then turned into the function signature.
+     * For example "example(uint, bool)"
+     */
+    "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\)))",
   ]),
 
   /* Syntax for constants */
