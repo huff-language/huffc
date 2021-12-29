@@ -2,6 +2,7 @@ import { padNBytes, toHex } from "./utils/bytes";
 import { compileMacro } from "./compiler/compiler";
 import { parseFile, setStoragePointerConstants } from "./parser/high-level";
 import { ethers } from "../tests/huff/node_modules/ethers/lib";
+import { generateAbi } from "./output";
 
 /**
  * Compile a Huff file.
@@ -9,18 +10,21 @@ import { ethers } from "../tests/huff/node_modules/ethers/lib";
  * @param args An array containing the arguments to the macro.
  * @returns The compiled bytecode.
  */
-const compile = (filePath: string, args: { type: string; value: string }[]) => {
+const compile = (filePath: string, output: string, args: { type: string; value: string }[]) => {
   // Parse the file and generate definitions.
-  const { macros, constants, functions, tables } = parseFile(filePath);
+  const { macros, constants, tables, functions, events } = parseFile(filePath);
+
+  // Generate the contract ABI.
+  generateAbi(output, functions, events);
 
   // Set storage pointer constants.
   constants.data = setStoragePointerConstants(["CONSTRUCTOR", "MAIN"], macros.data, constants);
 
   // Compile the macros.
-  const mainBytecode = macros["MAIN"]
+  const mainBytecode = macros.data["MAIN"]
     ? compileMacro("MAIN", [], macros.data, constants.data, tables.data)
     : "";
-  const constructorBytecode = macros["CONSTRUCTORS"]
+  const constructorBytecode = macros.data["CONSTRUCTORS"]
     ? compileMacro("CONSTRUCTOR", [], macros.data, constants.data, tables.data)
     : "";
 
