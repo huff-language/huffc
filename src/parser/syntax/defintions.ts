@@ -61,7 +61,7 @@ export const HIGH_LEVEL = {
 
   FUNCTION: combineRegexElements([
     /* #function at the start of the line */
-    "^(?:[\\s\\n]*[\\s\\n]*#function)",
+    "^(?:[\\s\\n]*[\\s\\n]*#define function)",
 
     /**
      * The function name and parameter types
