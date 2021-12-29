@@ -19,7 +19,7 @@ export const convertNumberToBytes = (number: number): string => {
 /**
  * Given an array, find the lowest missing (non-negative) number
  */
-export const findLowest = (value: number, arr: number[]) => {
+export const findLowest = (value: number, arr: number[]): number => {
   return arr.indexOf(value) < 0 ? value : findLowest(value + 1, arr);
 };
 
@@ -50,7 +50,7 @@ export const toHex = (number: number): string => {
 /**
  * Pad a hex value with zeroes.
  */
-export const padNBytes = (hex, numBytes) => {
+export const padNBytes = (hex: string, numBytes: number) => {
   if (hex.length > numBytes * 2) {
     throw new Error(`value ${hex} has more than ${numBytes} bytes!`);
   }
