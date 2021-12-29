@@ -216,7 +216,10 @@ export const setStoragePointerConstants = (
       const constantName = definition[1];
 
       // Push the array to the usedStoragePointerConstants array.
-      if (constantName.endsWith("_STORAGE_POINTER")) {
+      if (
+        constantName.endsWith("_STORAGE_POINTER") &&
+        !usedStoragePointerConstants.includes(constantName)
+      ) {
         usedStoragePointerConstants.push(constantName);
       }
 
