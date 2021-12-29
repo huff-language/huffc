@@ -2,12 +2,13 @@ import getAllFileContents from "./utils/contents";
 
 import { isEndOfData } from "./utils/regex";
 import { Definitions } from "./utils/types";
-import { HIGH_LEVEL } from "./syntax/defintions";
+import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
 import { parseArgs, getLineNumber } from "./utils/parsing";
 
 import { solidityKeccak256, keccak256, arrayify } from "ethers/lib/utils";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
+import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils/bytes";
 
 /**
  * Parse a file, storing the definitions of all constants, macros, and tables.
@@ -179,4 +180,124 @@ export const parseFile = (
 
   // Return all values
   return { macros, constants, functions, tables };
+};
+
+export const setStoragePointerConstants = (
+  macrosToSearch: string[],
+  macros: Definitions["data"],
+  constants: Definitions
+) => {
+  // Generate an array of all storage pointer constants
+  const storagePointerConstants = constants.defintions.filter((constant: string) =>
+    constant.endsWith("_STORAGE_POINTER")
+  );
+
+  // Array of used storage pointer constants.
+  const usedStoragePointerConstants = [];
+
+  // Define a functinon that iterates over all macros and adds the storage pointer constants.
+  const getUsedStoragePointerConstants = (name: string, revertIfNonExistant: boolean) => {
+    // Store the macro body.
+    let body = macros[name].value;
+
+    // Check if the macro exists.
+    if (!body) {
+      // Check if we should revert (and revert).
+      if (revertIfNonExistant) throw new Error(`Macro ${name} does not exist`);
+
+      // Otherwise just return.
+      return;
+    }
+
+    // If the next call is a constant call.
+    if (body.match(MACRO_CODE.CONSTANT_CALL)) {
+      // Store the constant definition.
+      const definition = body.match(MACRO_CODE.CONSTANT_CALL);
+      const constantName = definition[1];
+
+      // Push the array to the usedStoragePointerConstants array.
+      if (constantName.endsWith("_STORAGE_POINTER")) {
+        usedStoragePointerConstants.push(constantName);
+      }
+
+      // Slice the body.
+      body = body.slice(definition[0].length);
+    }
+    // If the next call is a macro call.
+    else if (body.match(MACRO_CODE.MACRO_CALL)) {
+      // Store the macro definition.
+      const definition = body.match(MACRO_CODE.MACRO_CALL);
+      const macroName = definition[1];
+
+      // Get the used storage pointer constants.
+      getUsedStoragePointerConstants(macroName, true);
+
+      // Slice the body.
+      body = body.slice(definition[0].length);
+    }
+    // Otherwise just slice the body by one.
+    else {
+      body.slice(1);
+    }
+  };
+
+  // Loop through the given macros and generate the used storage pointer constants.
+  macrosToSearch.forEach((macroName) => {
+    getUsedStoragePointerConstants(macroName, false);
+  });
+
+  // Iterate through the ordered pointers and generate
+  // an array (ordered by the defined order) of all storage pointer constants.
+  const orderedStoragePointerConstants = constants.defintions.filter((constant: string) => {
+    usedStoragePointerConstants.includes(constant);
+  });
+
+  // Update and return the constants map.
+  return setStoragePointers(constants.data, orderedStoragePointerConstants);
+};
+
+/**
+ * Assign constants that use the builtin FREE_STORAGE_POINTER(
+ * @param constants Maps the name of constants to their values
+ * @param order The order that the constants were declared in
+ */
+export const setStoragePointers = (constants: Definitions["data"], order: string[]) => {
+  const usedPointers: number[] = [];
+
+  // Iterate over the array of constants.
+  order.forEach((name) => {
+    if (name.endsWith("_STORAGE_POINTER")) {
+      const value = constants[name].value;
+
+      // If the value is a hex literal.
+      if (value.startsWith("0x")) {
+        /* 
+        If the pointer is already used, throw an error.
+        In order to safely circumvent this, all constant-defined pointers must be defined before
+        pointers that use FREE_STORAGE_POINTER.
+        */
+        if (usedPointers.includes(convertBytesToNumber(value))) {
+          throw `Constant ${name} uses already existing pointer`;
+        }
+
+        // Add the pointer to the list of used pointers.
+        usedPointers.push(convertBytesToNumber(value));
+      }
+
+      // The value calls FREE_STORAGE_POINTER.
+      else if (value == "FREE_STORAGE_POINTER()") {
+        // Find the lowest available pointer value.
+        const pointer = findLowest(0, usedPointers);
+
+        // Add the pointer to the list of used pointers.
+        usedPointers.push(pointer);
+
+        // Set the constant to the pointer value.
+        constants[name].value = convertNumberToBytes(pointer);
+      }
+    }
+  });
+
+  // Return the new constants value.
+  return constants;
 };
