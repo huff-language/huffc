@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "author": "JetJadeja",
   "bin": {
-    "huff": "bin/huffc"
+    "huffc": "bin/huffc"
   },
   "dependencies": {
     "bn.js": "^4.11.8",
