@@ -6,7 +6,7 @@ Huff is a low-level programming language, designed for developing highly optimiz
 
 Rather than having functions, Huff has macros - individual blocks of bytecode that can be rigorously tested and evaluated using the Huff runtime testing suite.
 
-Originally developed by the Aztec Protocol team, Huff was developed to write of [Weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules), an on-chain eliptical curve arithmetic library that required code so optimized, that it could not be written in Solidity, or even Yul.
+Originally developed by the Aztec Protocol team, Huff was developed to write [Weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules), an on-chain eliptical curve arithmetic library that required code so optimized, that it could not be written in Solidity, or even Yul.
 
 While Huff can be used by EVM experts to design highly-efficient smart contracts for use in production, it can also serve as a way for beginners to learn more about the Ethereum Virtual Machine, projects built on it, and languages made for it.
 
