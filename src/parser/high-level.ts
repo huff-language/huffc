@@ -89,6 +89,18 @@ export const parseFile = (
         // Slice the input.
         input = input.slice(functionDef[0].length);
       }
+      // Check if we're parsing an event defintion.
+      else if (HIGH_LEVEL.EVENT.test(input)) {
+        // Parse the event definition.
+        const eventDef = input.match(HIGH_LEVEL.EVENT);
+
+        // Calculate the hash of the event definition and store the first 4 bytes.
+        // This is the signature of the event.
+        const name = eventDef[2];
+
+        // Store the args.
+        const args = parseArgs(eventDef[3]).map((arg) => arg.replace("indexed", " indexed"));
+      }
       // Check if we're parsing a code table definition.
       else if (HIGH_LEVEL.CODE_TABLE.test(input)) {
         // Parse the table definition.
@@ -197,17 +209,20 @@ export const setStoragePointerConstants = (
 
   // Define a functinon that iterates over all macros and adds the storage pointer constants.
   const getUsedStoragePointerConstants = (name: string, revertIfNonExistant: boolean) => {
-    // Store the macro body.
-    let body = macros[name].value;
+    // Store macro.
+    const macro = macros[name];
 
     // Check if the macro exists.
-    if (!body) {
+    if (!macro) {
       // Check if we should revert (and revert).
       if (revertIfNonExistant) throw new Error(`Macro ${name} does not exist`);
 
       // Otherwise just return.
       return;
     }
+
+    // Store the macro body.
+    let body = macros[name].value;
 
     // If the next call is a constant call.
     if (body.match(MACRO_CODE.CONSTANT_CALL)) {
