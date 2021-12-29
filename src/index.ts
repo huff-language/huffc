@@ -4,18 +4,25 @@ import { parseFile, setStoragePointerConstants } from "./parser/high-level";
 import { ethers } from "ethers";
 import { generateAbi } from "./output";
 
+/* Compilation Input Type */
+type HuffCompilerArgs = {
+  filePath: string;
+  generateAbi: boolean;
+  constructorArgs?: { type: string; value: string }[];
+};
+
 /**
  * Compile a Huff file.
  * @param filePath The path to the file.
  * @param args An array containing the arguments to the macro.
  * @returns The compiled bytecode.
  */
-const compile = (filePath: string, output: string, args: { type: string; value: string }[]) => {
+const compile = (args: HuffCompilerArgs) => {
   // Parse the file and generate definitions.
-  const { macros, constants, tables, functions, events } = parseFile(filePath);
+  const { macros, constants, tables, functions, events } = parseFile(args.filePath);
 
   // Generate the contract ABI.
-  generateAbi(output, functions, events);
+  const abi = args.generateAbi ? generateAbi(functions, events) : "";
 
   // Set storage pointer constants.
   constants.data = setStoragePointerConstants(["CONSTRUCTOR", "MAIN"], macros.data, constants);
@@ -39,13 +46,12 @@ const compile = (filePath: string, output: string, args: { type: string; value: 
   // push2(contract size) dup1 push2(offset to code) push1(0) codecopy push1(0) return
   const bootstrapCode = `61${contractSize}8061${contractCodeOffset}6000396000f3`;
   const constructorCode = `${constructorBytecode}${bootstrapCode}`;
-  const deployedBytecode = `${constructorCode}${mainBytecode}`;
-
-  // If there are passed args, encode them.
-  encodeArgs(args);
+  const deployedBytecode = `${constructorCode}${mainBytecode}${
+    args.constructorArgs ? encodeArgs(args.constructorArgs) : ""
+  }`;
 
   // Return the bytecode.
-  return deployedBytecode;
+  return { bytecode: deployedBytecode, abi: abi };
 };
 
 /**

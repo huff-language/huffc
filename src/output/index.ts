@@ -8,11 +8,7 @@ import { Definitions } from "../parser/utils/types";
  * @param events Event definitions map.
  * @returns Contract ABI.
  */
-export const generateAbi = (
-  path: string,
-  functions: Definitions["data"],
-  events: Definitions["data"]
-) => {
+export const generateAbi = (functions: Definitions["data"], events: Definitions["data"]) => {
   // The ABI array.
   const abi = [];
 
@@ -58,9 +54,6 @@ export const generateAbi = (
     });
   });
 
-  // If the path exists, write the ABI to it.
-  if (path.length > 0) fs.writeFileSync(path, JSON.stringify(abi, null, 2));
-
   // Return the ABI.
-  return JSON.stringify(abi);
+  return JSON.stringify(abi, null, 2);
 };
