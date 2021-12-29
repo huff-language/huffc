@@ -1,7 +1,7 @@
 {
   "name": "huff-language",
   "description": "A low level programming language for the Ethereum Virtual Machine",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "JetJadeja",
   "bin": {
     "huff": "bin/huff"
