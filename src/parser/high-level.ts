@@ -16,16 +16,24 @@ import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils
  */
 export const parseFile = (
   filePath: string
-): { macros: Definitions; constants: Definitions; functions: Definitions; tables: Definitions } => {
+): {
+  macros: Definitions;
+  constants: Definitions;
+  functions: Definitions["data"];
+  events: Definitions["data"];
+  tables: Definitions;
+} => {
   // Get an array of file contents.
   const contents: string[] = getAllFileContents(filePath);
 
-  // Set variables.
+  // Set defintion variables.
   const macros: Definitions = { data: {}, defintions: [] };
   const constants: Definitions = { data: {}, defintions: [] };
-  const functions: Definitions = { data: {}, defintions: [] };
   const tables: Definitions = { data: {}, defintions: [] };
 
+  // Set output variables.
+  const functions: Definitions["data"] = {};
+  const events: Definitions["data"] = {};
   const errors = [];
 
   // Parse the file contents.
@@ -55,7 +63,7 @@ export const parseFile = (
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
         const name = constant[2];
-        const value = constant[3].substring(2);
+        const value = constant[3].replace("0x", "");
 
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name) throw new Error(`Constant ${name} is not uppercase`);
@@ -84,7 +92,7 @@ export const parseFile = (
         };
 
         // Store the function definition.
-        functions.data[name] = { value: name, args: [], data: definition };
+        functions[name] = { value: name, args: [], data: definition };
 
         // Slice the input.
         input = input.slice(functionDef[0].length);
@@ -100,6 +108,12 @@ export const parseFile = (
 
         // Store the args.
         const args = parseArgs(eventDef[3]).map((arg) => arg.replace("indexed", " indexed"));
+
+        // Store the event definition.
+        events[name] = { value: name, args };
+
+        // Slice the input.
+        input = input.slice(eventDef[0].length);
       }
       // Check if we're parsing a code table definition.
       else if (HIGH_LEVEL.CODE_TABLE.test(input)) {
@@ -191,7 +205,7 @@ export const parseFile = (
   });
 
   // Return all values
-  return { macros, constants, functions, tables };
+  return { macros, constants, functions, events, tables };
 };
 
 export const setStoragePointerConstants = (
@@ -200,9 +214,9 @@ export const setStoragePointerConstants = (
   constants: Definitions
 ) => {
   // Generate an array of all storage pointer constants
-  const storagePointerConstants = constants.defintions.filter((constant: string) =>
-    constant.endsWith("_STORAGE_POINTER")
-  );
+  const storagePointerConstants = constants.defintions.filter((constant: string) => {
+    return constants.data[constant].value.startsWith("FREE_STORAGE_POINTER");
+  });
 
   // Array of used storage pointer constants.
   const usedStoragePointerConstants = [];
@@ -224,38 +238,40 @@ export const setStoragePointerConstants = (
     // Store the macro body.
     let body = macros[name].value;
 
-    // If the next call is a constant call.
-    if (body.match(MACRO_CODE.CONSTANT_CALL)) {
-      // Store the constant definition.
-      const definition = body.match(MACRO_CODE.CONSTANT_CALL);
-      const constantName = definition[1];
+    while (!isEndOfData(body)) {
+      // If the next call is a constant call.
+      if (body.match(MACRO_CODE.CONSTANT_CALL)) {
+        // Store the constant definition.
+        const definition = body.match(MACRO_CODE.CONSTANT_CALL);
+        const constantName = definition[1];
 
-      // Push the array to the usedStoragePointerConstants array.
-      if (
-        constantName.endsWith("_STORAGE_POINTER") &&
-        !usedStoragePointerConstants.includes(constantName)
-      ) {
-        usedStoragePointerConstants.push(constantName);
+        // Push the array to the usedStoragePointerConstants array.
+        if (
+          constants.data[constantName].value === "FREE_STORAGE_POINTER()" &&
+          !usedStoragePointerConstants.includes(constantName)
+        ) {
+          usedStoragePointerConstants.push(constantName);
+        }
+
+        // Slice the body.
+        body = body.slice(definition[0].length);
       }
+      // If the next call is a macro call.
+      else if (body.match(MACRO_CODE.MACRO_CALL)) {
+        // Store the macro definition.
+        const definition = body.match(MACRO_CODE.MACRO_CALL);
+        const macroName = definition[1];
 
-      // Slice the body.
-      body = body.slice(definition[0].length);
-    }
-    // If the next call is a macro call.
-    else if (body.match(MACRO_CODE.MACRO_CALL)) {
-      // Store the macro definition.
-      const definition = body.match(MACRO_CODE.MACRO_CALL);
-      const macroName = definition[1];
+        // Get the used storage pointer constants.
+        getUsedStoragePointerConstants(macroName, true);
 
-      // Get the used storage pointer constants.
-      getUsedStoragePointerConstants(macroName, true);
-
-      // Slice the body.
-      body = body.slice(definition[0].length);
-    }
-    // Otherwise just slice the body by one.
-    else {
-      body.slice(1);
+        // Slice the body.
+        body = body.slice(definition[0].length);
+      }
+      // Otherwise just slice the body by one.
+      else {
+        body = body.slice(1);
+      }
     }
   };
 
@@ -266,9 +282,9 @@ export const setStoragePointerConstants = (
 
   // Iterate through the ordered pointers and generate
   // an array (ordered by the defined order) of all storage pointer constants.
-  const orderedStoragePointerConstants = constants.defintions.filter((constant: string) => {
-    usedStoragePointerConstants.includes(constant);
-  });
+  const orderedStoragePointerConstants = constants.defintions.filter((constant: string) =>
+    usedStoragePointerConstants.includes(constant)
+  );
 
   // Update and return the constants map.
   return setStoragePointers(constants.data, orderedStoragePointerConstants);
@@ -284,35 +300,33 @@ export const setStoragePointers = (constants: Definitions["data"], order: string
 
   // Iterate over the array of constants.
   order.forEach((name) => {
-    if (name.endsWith("_STORAGE_POINTER")) {
-      const value = constants[name].value;
+    const value = constants[name].value;
 
-      // If the value is a hex literal.
-      if (value.startsWith("0x")) {
-        /* 
+    // If the value is a hex literal.
+    if (!value.startsWith("FREE_")) {
+      /* 
         If the pointer is already used, throw an error.
         In order to safely circumvent this, all constant-defined pointers must be defined before
         pointers that use FREE_STORAGE_POINTER.
         */
-        if (usedPointers.includes(convertBytesToNumber(value))) {
-          throw `Constant ${name} uses already existing pointer`;
-        }
-
-        // Add the pointer to the list of used pointers.
-        usedPointers.push(convertBytesToNumber(value));
+      if (usedPointers.includes(convertBytesToNumber(value))) {
+        throw `Constant ${name} uses already existing pointer`;
       }
 
-      // The value calls FREE_STORAGE_POINTER.
-      else if (value == "FREE_STORAGE_POINTER()") {
-        // Find the lowest available pointer value.
-        const pointer = findLowest(0, usedPointers);
+      // Add the pointer to the list of used pointers.
+      usedPointers.push(convertBytesToNumber(value));
+    }
 
-        // Add the pointer to the list of used pointers.
-        usedPointers.push(pointer);
+    // The value calls FREE_STORAGE_POINTER.
+    else if (value == "FREE_STORAGE_POINTER()") {
+      // Find the lowest available pointer value.
+      const pointer = findLowest(0, usedPointers);
 
-        // Set the constant to the pointer value.
-        constants[name].value = convertNumberToBytes(pointer);
-      }
+      // Add the pointer to the list of used pointers.
+      usedPointers.push(pointer);
+
+      // Set the constant to the pointer value.
+      constants[name].value = convertNumberToBytes(pointer).replace("0x", "");
     }
   });
 
