@@ -51,7 +51,7 @@ const compile = (args: HuffCompilerArgs) => {
   }`;
 
   // Return the bytecode.
-  return { bytecode: deployedBytecode, abi: abi };
+  return { bytecode: deployedBytecode, runtimeBytecode: mainBytecode, abi: abi };
 };
 
 /**
