@@ -36,7 +36,7 @@ files.forEach((file) => {
 
   // Compile the file.
   const result = compile({
-    filePath: files[0],
+    filePath: file,
     generateAbi: true,
   });
 
