@@ -13,7 +13,8 @@ program
   .option("--base-path <path>", "The base path to the contracts", "./")
   .option("--output-directory <output-dir>", "The output directory", "./")
   .option("--bytecode", "Generate and log bytecode", false)
-  .option("-o, output", "The output file");
+  .option("-o, output", "The output file")
+  .option("-p, --paste", "Paste the output to the terminal");
 
 // Parse the terminal arguments.
 program.parse(process.argv);
@@ -36,7 +37,7 @@ files.forEach((file) => {
   // Compile the file.
   const result = compile({
     filePath: files[0],
-    generateAbi: options.output,
+    generateAbi: true,
   });
 
   // If the user has specified an output file, write the output to the file.
@@ -44,5 +45,6 @@ files.forEach((file) => {
   if (options.output) fs.writeFileSync(outputPath, result.abi);
 
   // If the user has specified for us to log the bytecode, log it.
-  if (options.bytecode) console.log(result.bytecode);
+  if (options.bytecode && !options.paste) console.log(result.bytecode);
+  if (options.paste) console.log(result);
 });
