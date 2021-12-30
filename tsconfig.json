@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "outDir": "./dist",
     "suppressImplicitAnyIndexErrors": true,
     "noImplicitAny": false,
     "plugins": [
