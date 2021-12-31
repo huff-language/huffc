@@ -27,10 +27,10 @@ var parseMacro = function (macro, macros, constants, jumptables) {
             // Parse the macro call.
             token = input.match(defintions_1.MACRO_CODE.MACRO_CALL);
             var name_1 = token[1];
-            var args_1 = token[3] ? (0, parsing_1.parseArgs)(token[3]) : [];
+            var args_1 = token[2] ? (0, parsing_1.parseArgs)(token[2]) : [];
             // Ensure the macro exists.
             if (!macros[name_1])
-                throw new Error("Macro does not exist.");
+                throw new Error("Macro ".concat(name_1, " does not exist."));
             // Add the macro's operations to the macro operations.
             operations.push({
                 type: types_1.OperationType.MACRO_CALL,

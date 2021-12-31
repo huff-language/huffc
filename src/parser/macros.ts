@@ -37,10 +37,10 @@ const parseMacro = (
       // Parse the macro call.
       token = input.match(MACRO_CODE.MACRO_CALL);
       const name = token[1];
-      const args = token[3] ? parseArgs(token[3]) : [];
+      const args = token[2] ? parseArgs(token[2]) : [];
 
       // Ensure the macro exists.
-      if (!macros[name]) throw new Error("Macro does not exist.");
+      if (!macros[name]) throw new Error(`Macro ${name} does not exist.`);
 
       // Add the macro's operations to the macro operations.
       operations.push({

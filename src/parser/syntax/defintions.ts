@@ -101,7 +101,7 @@ export const HIGH_LEVEL = {
   /* Syntax for constants */
   CONSTANT: combineRegexElements([
     /* "#define" at the start of the line */
-    "^(?:[\\s\\n]*#[\\s\\n]*define)",
+    "^(?:[\\s\\n]*#define)",
 
     /* The whole word "constant" */
     "\\b(constant)\\b",
@@ -190,11 +190,14 @@ export const MACRO_CODE = {
     /* Any number of alphanumeric characters + underscores */
     "^(?:[\\s\\n]*)([a-zA-Z0-9_]+)",
 
-    /* An optional pair of brackets that must contain characters (template parameters) */
-    "(?:<([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)>)?",
+    /* Open Parenthesis */
+    "\\(",
 
-    /* Parenthesis at the end of the macro call */
-    "(?:\\(([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)\\))",
+    /* Any alphanumeric combination */
+    "([a-zA-Z0-9_\\-]*)",
+
+    /* Closing parenthesis */
+    "\\)\\s*\\n*",
   ]),
 
   /* Syntax for constant calls */

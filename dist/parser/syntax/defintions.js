@@ -81,7 +81,7 @@ exports.HIGH_LEVEL = {
     /* Syntax for constants */
     CONSTANT: (0, regex_1.combineRegexElements)([
         /* "#define" at the start of the line */
-        "^(?:[\\s\\n]*#[\\s\\n]*define)",
+        "^(?:[\\s\\n]*#define)",
         /* The whole word "constant" */
         "\\b(constant)\\b",
         /* The name of the constant, which can be everything */
@@ -149,10 +149,12 @@ exports.MACRO_CODE = {
     MACRO_CALL: (0, regex_1.combineRegexElements)([
         /* Any number of alphanumeric characters + underscores */
         "^(?:[\\s\\n]*)([a-zA-Z0-9_]+)",
-        /* An optional pair of brackets that must contain characters (template parameters) */
-        "(?:<([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)>)?",
-        /* Parenthesis at the end of the macro call */
-        "(?:\\(([a-zA-Z0-9_,\\+\\-\\*\\s\\n]+)\\))",
+        /* Open Parenthesis */
+        "\\(",
+        /* Any alphanumeric combination */
+        "([a-zA-Z0-9_\\-]*)",
+        /* Closing parenthesis */
+        "\\)\\s*\\n*",
     ]),
     /* Syntax for constant calls */
     CONSTANT_CALL: (0, regex_1.combineRegexElements)([
