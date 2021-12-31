@@ -10,11 +10,11 @@ import { readFile } from "../../utils/files";
  * @param filepath The path to the original file
  */
 const getAllFileContents = (filepath: string) => {
-  // Array of raw file contents.
-  const contents: string[] = [];
-
   // Map indicating whether the filepath has been included.
   const imported: { [filepath: string]: boolean } = {};
+
+  // An array of all imported files.
+  const imports: string[] = [];
 
   // Function that reads a file and adds it to the contents array.
   const getContents = (filepath: string, imported: { [filepath: string]: boolean }): string[] => {
@@ -30,6 +30,9 @@ const getAllFileContents = (filepath: string) => {
       // Add the file contents to the includes array.
       includes = [...includes, ...getContents(importPath, imported)];
 
+      // Add the file to the imports array.
+      imports.push(importPath);
+
       // Mark the file as imported.
       imported[importPath] = true;
     });
@@ -38,7 +41,7 @@ const getAllFileContents = (filepath: string) => {
   };
 
   // Get the file contents.
-  return getContents(filepath, imported);
+  return { contents: getContents(filepath, imported), imports: imports };
 };
 
 /**
