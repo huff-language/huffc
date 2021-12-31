@@ -22,7 +22,7 @@ var compile = function (args) {
     var mainBytecode = macros.data["MAIN"]
         ? (0, compiler_1.compileMacro)("MAIN", [], macros.data, constants.data, tables.data)
         : "";
-    var constructorBytecode = macros.data["CONSTRUCTORS"]
+    var constructorBytecode = macros.data["CONSTRUCTOR"]
         ? (0, compiler_1.compileMacro)("CONSTRUCTOR", [], macros.data, constants.data, tables.data)
         : "";
     // Store the sizes of the bytecode.

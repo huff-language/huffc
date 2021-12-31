@@ -31,7 +31,7 @@ const compile = (args: HuffCompilerArgs) => {
   const mainBytecode = macros.data["MAIN"]
     ? compileMacro("MAIN", [], macros.data, constants.data, tables.data)
     : "";
-  const constructorBytecode = macros.data["CONSTRUCTORS"]
+  const constructorBytecode = macros.data["CONSTRUCTOR"]
     ? compileMacro("CONSTRUCTOR", [], macros.data, constants.data, tables.data)
     : "";
 
