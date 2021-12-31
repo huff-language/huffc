@@ -29,7 +29,6 @@ export const generateAbi = (functions: Definitions["data"], events: Definitions[
       outputs: outputs.map((type) => {
         return { name: "", type };
       }),
-      constant: false,
     });
   });
 
