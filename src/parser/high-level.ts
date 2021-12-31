@@ -84,10 +84,14 @@ export const parseFile = (
         // This is the signature of the function.
         const name = functionDef[2];
 
+        // Store the input and output strings.
+        const inputs = functionDef[3];
+        const outputs = functionDef[5];
+
         // Store the function values.
         const definition = {
-          inputs: parseArgs(functionDef[3]),
-          outputs: parseArgs(functionDef[5]),
+          inputs: inputs ? parseArgs(inputs) : [],
+          outputs: outputs ? parseArgs(functionDef[5]) : [],
           type: functionDef[4],
         };
 

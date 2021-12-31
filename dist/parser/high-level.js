@@ -62,10 +62,13 @@ var parseFile = function (filePath) {
                 // Calculate the hash of the function definition and store the first 4 bytes.
                 // This is the signature of the function.
                 var name_2 = functionDef[2];
+                // Store the input and output strings.
+                var inputs = functionDef[3];
+                var outputs = functionDef[5];
                 // Store the function values.
                 var definition = {
-                    inputs: (0, parsing_1.parseArgs)(functionDef[3]),
-                    outputs: (0, parsing_1.parseArgs)(functionDef[5]),
+                    inputs: inputs ? (0, parsing_1.parseArgs)(inputs) : [],
+                    outputs: outputs ? (0, parsing_1.parseArgs)(functionDef[5]) : [],
                     type: functionDef[4]
                 };
                 // Store the function definition.
