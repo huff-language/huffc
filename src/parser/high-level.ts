@@ -24,7 +24,11 @@ export const parseFile = (
   tables: Definitions;
 } => {
   // Get an array of file contents.
-  const contents: string[] = getAllFileContents(filePath);
+  const fileContents = getAllFileContents(filePath);
+
+  // Extract information.
+  const contents = fileContents.contents;
+  const imports = fileContents.imports;
 
   // Set defintion variables.
   const macros: Definitions = { data: {}, defintions: [] };
@@ -34,10 +38,9 @@ export const parseFile = (
   // Set output variables.
   const functions: Definitions["data"] = {};
   const events: Definitions["data"] = {};
-  const errors = [];
 
   // Parse the file contents.
-  contents.forEach((content: string) => {
+  contents.forEach((content: string, index: number) => {
     let input = content;
 
     while (!isEndOfData(input)) {
@@ -66,7 +69,13 @@ export const parseFile = (
         const value = constant[3].replace("0x", "");
 
         // Ensure that the constant name is all uppercase.
-        if (name.toUpperCase() !== name) throw new Error(`Constant ${name} is not uppercase`);
+        if (name.toUpperCase() !== name)
+          throw new Error(
+            `ParserError at ${imports[index]}:${getLineNumber(
+              input,
+              content.indexOf(input)
+            )}: Constant ${name} must be uppercase.`
+          );
 
         // Store the constant.
         constants.defintions.push(name);
@@ -144,11 +153,11 @@ export const parseFile = (
 
         // Ensure the type is valid.
         if (type !== "jumptable__packed")
-          errors.push(
-            `Error at line ${getLineNumber(
+          throw new Error(
+            `ParserError at ${imports[index]}:${getLineNumber(
               input,
               content.indexOf(input)
-            )}: Invalid type ${type} \n ${table[0]}`
+            )}: Table ${table[0]} has invalid type: ${type}`
           );
 
         // Parse the table.
@@ -175,11 +184,11 @@ export const parseFile = (
 
         // Ensure the type is valid.
         if (type !== "jumptable")
-          errors.push(
-            `Error at line ${getLineNumber(
+          throw new Error(
+            `ParserError at ${imports[index]}${getLineNumber(
               input,
               content.indexOf(input)
-            )}: Invalid type ${type} \n ${table[0]}`
+            )}: Table ${table[0]} has invalid type: ${type}`
           );
 
         // Parse the table.
@@ -197,13 +206,19 @@ export const parseFile = (
         // Slice the input.
         input = input.slice(table[0].length);
       } else {
-        // Index of the next line break.
-        const index = input.indexOf("\n");
+        // Get the index of the current input.
+        const index = content.indexOf(input);
 
-        // If the index exists, slice the input.
-        if (index !== -1) {
-          input = input.slice(index);
-        }
+        // Get the line number of the file.
+        const lineNumber = content.substring(0, index).split("\n").length;
+
+        // Raise error.
+        throw new Error(
+          `ParserError at ${imports[index]}${getLineNumber(
+            input,
+            content.indexOf(input)
+          )}: Invalid Syntax`
+        );
       }
     }
   });
