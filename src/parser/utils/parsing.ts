@@ -66,8 +66,12 @@ export const removeComments = (data: string): string => {
 /**
  * Given a string and an index, get the line number that the index is located on
  */
-export const getLineNumber = (str: string, index: number): number => {
-  return str.substr(0, index).split("\n").length;
+export const getLineNumber = (str: string, org: string): number => {
+  // Get the index of the current input.
+  const index = org.indexOf(str);
+
+  // Get the line number of the file.
+  return str.substring(0, index).split("\n").length;
 };
 
 /**
