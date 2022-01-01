@@ -16,7 +16,9 @@ var compileMacro = function (name, args, macros, constants, jumptables) {
     var _a = (0, processor_1.processMacro)(name, 0, args, macros, constants, jumptables), bytecode = _a.bytecode, unmatchedJumps = _a.unmatchedJumps, tableInstances = _a.tableInstances, jumptable = _a.jumptable, jumpindices = _a.jumpindices;
     // Ensure that there are no unmatched jumps.
     if (unmatchedJumps.length > 0) {
-        throw new Error("Macro ".concat(name, ", unmatched jump labels ").concat(JSON.stringify(unmatchedJumps), " found, cannot compile"));
+        throw new Error("Compiler: Macro ".concat(name, " contains unmatched jump labels ").concat(unmatchedJumps
+            .map(function (jump) { return jump.label; })
+            .join(" "), ", cannot compile"));
     }
     // Instantiate variables
     var tableBytecodeOffset = bytecode.length / 2;

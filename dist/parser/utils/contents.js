@@ -19,29 +19,33 @@ var files_1 = require("../../utils/files");
  * @param filepath The path to the original file
  */
 var getAllFileContents = function (filepath) {
-    // Array of raw file contents.
-    var contents = [];
     // Map indicating whether the filepath has been included.
-    var imported = {};
+    var imported = { filepath: true };
+    // An array of all imported files.
+    var files = [filepath];
     // Function that reads a file and adds it to the contents array.
     var getContents = function (filepath, imported) {
         // Read the data from the file and remove all comments.
         var contents = (0, parsing_1.removeComments)((0, files_1.readFile)(filepath));
         var includes = [contents];
+        var imports = [filepath];
         // Read the file data from each of the imported files.
         getImports(contents).forEach(function (importPath) {
             // If the file has been imported, skip.
             if (imported[importPath])
                 return;
+            var _a = getContents(importPath, imported), newIncludes = _a[0], newImports = _a[1];
             // Add the file contents to the includes array.
-            includes = __spreadArray(__spreadArray([], includes, true), getContents(importPath, imported), true);
+            includes = __spreadArray(__spreadArray([], includes, true), newIncludes, true);
+            // Add the file to the imports array.
+            imports = __spreadArray(__spreadArray([], files, true), newImports, true);
             // Mark the file as imported.
             imported[importPath] = true;
         });
-        return includes;
+        return [includes, imports];
     };
     // Get the file contents.
-    return getContents(filepath, imported);
+    return { contents: getContents(filepath, imported)[0], imports: files };
 };
 /**
  * Given the contents of the file, return an array

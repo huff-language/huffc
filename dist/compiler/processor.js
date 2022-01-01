@@ -39,7 +39,7 @@ var processMacro = function (name, bytecodeOffset, args, macros, constants, jump
     // Check if the macro exists.
     var macro = macros[name];
     if (!macro)
-        throw new Error("Macro ".concat(macro, " does not exist."));
+        throw new Error("Processor: Failed to find ".concat(macro, "."));
     // Map argument names to values.
     var params = {};
     macro.args.forEach(function (arg, index) {
@@ -148,7 +148,7 @@ var processMacro = function (name, bytecodeOffset, args, macros, constants, jump
             }
             // Default
             default: {
-                throw new Error("Operation ".concat(operation.type, " does not exist."));
+                throw new Error("Processor: Cannot understand operation ".concat(operation.type, " in ").concat(name, "."));
             }
         }
     });
@@ -185,7 +185,7 @@ var processMacro = function (name, bytecodeOffset, args, macros, constants, jump
                     var after = formattedBytecode.slice(bytecodeIndex + 6);
                     // Ensure that the jump value is set with a placeholder.
                     if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== "xxxx")
-                        throw new Error("Expected indicies ".concat(bytecodeIndex + 2, " to ").concat(bytecodeIndex + 6, " to be jump location, of\n                          ").concat(formattedBytecode));
+                        throw new Error("Processor: Expected indicies ".concat(bytecodeIndex + 2, " to ").concat(bytecodeIndex + 6, " to be jump location, of ").concat(formattedBytecode));
                     // Insert the jump value.
                     formattedBytecode = "".concat(before).concat(jumpvalue).concat(after);
                 }
