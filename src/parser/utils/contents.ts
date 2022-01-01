@@ -11,37 +11,40 @@ import { readFile } from "../../utils/files";
  */
 const getAllFileContents = (filepath: string) => {
   // Map indicating whether the filepath has been included.
-  const imported: { [filepath: string]: boolean } = {};
+  const imported: { [filepath: string]: boolean } = { filepath: true };
 
   // An array of all imported files.
-  const imports: string[] = [];
+  const files: string[] = [filepath];
 
   // Function that reads a file and adds it to the contents array.
-  const getContents = (filepath: string, imported: { [filepath: string]: boolean }): string[] => {
+  const getContents = (filepath: string, imported: { [filepath: string]: boolean }): string[][] => {
     // Read the data from the file and remove all comments.
     const contents = removeComments(readFile(filepath));
     let includes: string[] = [contents];
+    let imports: string[] = [filepath];
 
     // Read the file data from each of the imported files.
     getImports(contents).forEach((importPath) => {
       // If the file has been imported, skip.
       if (imported[importPath]) return;
 
+      const [newIncludes, newImports] = getContents(importPath, imported);
+
       // Add the file contents to the includes array.
-      includes = [...includes, ...getContents(importPath, imported)];
+      includes = [...includes, ...newIncludes];
 
       // Add the file to the imports array.
-      imports.push(importPath);
+      imports = [...files, ...newImports];
 
       // Mark the file as imported.
       imported[importPath] = true;
     });
 
-    return includes;
+    return [includes, imports];
   };
 
   // Get the file contents.
-  return { contents: getContents(filepath, imported), imports: imports };
+  return { contents: getContents(filepath, imported)[0], imports: files };
 };
 
 /**
