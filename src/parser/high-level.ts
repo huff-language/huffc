@@ -40,7 +40,7 @@ export const parseFile = (
   const events: Definitions["data"] = {};
 
   // Parse the file contents.
-  contents.forEach((content: string, index: number) => {
+  contents.forEach((content: string, contentIndex: number) => {
     let input = content;
 
     while (!isEndOfData(input)) {
@@ -70,11 +70,11 @@ export const parseFile = (
 
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name)
-          throw new Error(
-            `ParserError at ${imports[index]}:${getLineNumber(
+          throw new SyntaxError(
+            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
               input,
-              content.indexOf(input)
-            )}: Constant ${name} must be uppercase.`
+              content
+            )}): Constant ${name} must be uppercase.`
           );
 
         // Store the constant.
@@ -153,11 +153,11 @@ export const parseFile = (
 
         // Ensure the type is valid.
         if (type !== "jumptable__packed")
-          throw new Error(
-            `ParserError at ${imports[index]}:${getLineNumber(
+          throw new SyntaxError(
+            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
               input,
-              content.indexOf(input)
-            )}: Table ${table[0]} has invalid type: ${type}`
+              content
+            )}): Table ${table[0]} has invalid type: ${type}`
           );
 
         // Parse the table.
@@ -184,11 +184,11 @@ export const parseFile = (
 
         // Ensure the type is valid.
         if (type !== "jumptable")
-          throw new Error(
-            `ParserError at ${imports[index]}${getLineNumber(
+          throw new SyntaxError(
+            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
               input,
-              content.indexOf(input)
-            )}: Table ${table[0]} has invalid type: ${type}`
+              content
+            )}): Table ${table[0]} has invalid type: ${type}`
           );
 
         // Parse the table.
@@ -213,11 +213,8 @@ export const parseFile = (
         const lineNumber = content.substring(0, index).split("\n").length;
 
         // Raise error.
-        throw new Error(
-          `ParserError at ${imports[index]}${getLineNumber(
-            input,
-            content.indexOf(input)
-          )}: Invalid Syntax`
+        throw new SyntaxError(
+          `ParserError at ${imports[contentIndex]}(Line ${lineNumber}): Invalid Syntax`
         );
       }
     }
@@ -232,11 +229,6 @@ export const setStoragePointerConstants = (
   macros: Definitions["data"],
   constants: Definitions
 ) => {
-  // Generate an array of all storage pointer constants
-  const storagePointerConstants = constants.defintions.filter((constant: string) => {
-    return constants.data[constant].value.startsWith("FREE_STORAGE_POINTER");
-  });
-
   // Array of used storage pointer constants.
   const usedStoragePointerConstants = [];
 
