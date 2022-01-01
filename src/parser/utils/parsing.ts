@@ -13,8 +13,9 @@ export const removeComments = (string: string): string => {
   let formatted = "";
 
   while (!isEndOfData(data)) {
-    const multiIndex = data.indexOf("/*");
-    const singleIndex = data.indexOf("//");
+    const multiIndex = data.indexOf("/*") === 0 ? 1 : data.indexOf("/*");
+    const singleIndex = data.indexOf("//") === 0 ? 1 : data.indexOf("//");
+
     if (multiIndex !== -1 && (multiIndex < singleIndex || singleIndex === -1)) {
       formatted += data.slice(0, multiIndex);
       const endBlock = data.indexOf("*/");
@@ -27,7 +28,7 @@ export const removeComments = (string: string): string => {
       formatted += data.slice(0, singleIndex);
       data = data.slice(singleIndex);
       const endBlock = data.indexOf("\n");
-      if (!endBlock) {
+      if (endBlock === -1) {
         formatted += " ".repeat(data.length);
         data = "";
       } else {
@@ -39,6 +40,7 @@ export const removeComments = (string: string): string => {
       break;
     }
   }
+
   return formatted;
 };
 
