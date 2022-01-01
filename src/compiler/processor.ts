@@ -23,7 +23,7 @@ export const processMacro = (
 ): any => {
   // Check if the macro exists.
   const macro = macros[name];
-  if (!macro) throw new Error(`Macro ${macro} does not exist.`);
+  if (!macro) throw new Error(`Processor: Failed to find ${macro}.`);
 
   // Map argument names to values.
   const params: { [name: string]: string } = {};
@@ -179,7 +179,7 @@ export const processMacro = (
       }
       // Default
       default: {
-        throw new Error(`Operation ${operation.type} does not exist.`);
+        throw new Error(`Processor: Cannot understand operation ${operation.type} in ${name}.`);
       }
     }
   });
@@ -226,10 +226,9 @@ export const processMacro = (
           // Ensure that the jump value is set with a placeholder.
           if (formattedBytecode.slice(bytecodeIndex + 2, bytecodeIndex + 6) !== "xxxx")
             throw new Error(
-              `Expected indicies ${bytecodeIndex + 2} to ${
+              `Processor: Expected indicies ${bytecodeIndex + 2} to ${
                 bytecodeIndex + 6
-              } to be jump location, of
-                          ${formattedBytecode}`
+              } to be jump location, of ${formattedBytecode}`
             );
 
           // Insert the jump value.
