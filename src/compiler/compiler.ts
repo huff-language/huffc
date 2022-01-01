@@ -30,7 +30,9 @@ export const compileMacro = (
   // Ensure that there are no unmatched jumps.
   if (unmatchedJumps.length > 0) {
     throw new Error(
-      `Macro ${name}, unmatched jump labels ${JSON.stringify(unmatchedJumps)} found, cannot compile`
+      `Compiler: Macro ${name} contains unmatched jump labels ${unmatchedJumps
+        .map((jump) => jump.label)
+        .join(" ")}, cannot compile`
     );
   }
 
