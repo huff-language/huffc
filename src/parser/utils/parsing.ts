@@ -5,62 +5,41 @@ import { isEndOfData } from "./regex";
  * Given a string, generate a new string without inline comments
  * @param data A string of data to parse
  */
-export const removeComments = (data: string): string => {
+export const removeComments = (string: string): string => {
   // The formatted version of our string.
   let formattedData: string = "";
 
+  let data = string;
+  let formatted = "";
+
   while (!isEndOfData(data)) {
-    // Store the index of the next single line comment.
-    const nextSingleLineCommentIndex = data.indexOf("//");
+    const multiIndex = data.indexOf("/*");
+    const singleIndex = data.indexOf("//");
+    if (multiIndex !== -1 && (multiIndex < singleIndex || singleIndex === -1)) {
+      formatted += data.slice(0, multiIndex);
+      const endBlock = data.indexOf("*/");
 
-    // Store the index of the next multi-line comment.
-    const nextMultiLineCommentIndex = data.indexOf("/*");
+      if (endBlock === -1) throw new Error("Could not find closing comment block.");
 
-    // If  a multiline comment exists and is before the next single line comment
-    if (
-      nextMultiLineCommentIndex !== -1 &&
-      (nextMultiLineCommentIndex > nextSingleLineCommentIndex || nextSingleLineCommentIndex === -1)
-    ) {
-      // Add code from the start of the string to the multi-line comment.
-      formattedData += data.slice(0, nextMultiLineCommentIndex);
-
-      // Find the end of the multi-line comment block (throw if it does not exist)
-      const endOfBlock = data.indexOf("*/");
-      assert(endOfBlock !== -1, `Multi-line comment block never closed`);
-
-      // Replace the multi-line comments.
-      formattedData += " ".repeat(endOfBlock - nextMultiLineCommentIndex + 2);
-
-      // Slice the inputted data.
-
-      data = data.slice(endOfBlock + 2);
-    }
-    // If a single line comment exists
-    else if (nextSingleLineCommentIndex !== -1) {
-      // Add code from the start of the string to the single line comment.
-      formattedData += data.slice(0, nextSingleLineCommentIndex);
-      data = data.slice(nextSingleLineCommentIndex);
-
-      // The end of a single-lined comment is the end of the line
-      const endOfBlock = data.indexOf("\n");
-
-      if (!endOfBlock) {
-        formattedData += " ".repeat(data.length);
-
-        // Set data to "", since there is no more data to parse.
+      formatted += " ".repeat(endBlock - multiIndex + 2);
+      data = data.slice(endBlock + 2);
+    } else if (singleIndex !== -1) {
+      formatted += data.slice(0, singleIndex);
+      data = data.slice(singleIndex);
+      const endBlock = data.indexOf("\n");
+      if (!endBlock) {
+        formatted += " ".repeat(data.length);
         data = "";
       } else {
-        formattedData += " ".repeat(endOfBlock + 1);
-        data = data.slice(endOfBlock + 1);
+        formatted += " ".repeat(endBlock + 1);
+        data = data.slice(endBlock + 1);
       }
     } else {
-      // If there are no more comments, add the rest of the data to the formatted string.
-      formattedData += data;
+      formatted += data;
       break;
     }
   }
-
-  return formattedData;
+  return formatted;
 };
 
 /**

@@ -61,6 +61,10 @@ export const parseFile = (
         // Slice the input
         input = input.slice(macro[0].length);
       }
+      // Check if we are parsing an import.
+      else if (HIGH_LEVEL.IMPORT.test(input)) {
+        input = input.slice(input.match(HIGH_LEVEL.IMPORT)[0].length);
+      }
       // Check if we are parsing a constant definition.
       else if (HIGH_LEVEL.CONSTANT.test(input)) {
         // Parse constant definition.
