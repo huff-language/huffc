@@ -31,7 +31,7 @@ const getAllFileContents = (filepath: string) => {
       const [newIncludes, newImports] = getContents(importPath, imported);
 
       // Add the file contents to the includes array.
-      includes = [...includes, ...newIncludes];
+      includes = [...newIncludes, ...includes];
 
       // Add the file to the imports array.
       imports = [...files, ...newImports];
