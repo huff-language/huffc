@@ -13,8 +13,8 @@ export const removeComments = (string: string): string => {
   let formatted = "";
 
   while (!isEndOfData(data)) {
-    const multiIndex = data.indexOf("/*") === 0 ? 1 : data.indexOf("/*");
-    const singleIndex = data.indexOf("//") === 0 ? 1 : data.indexOf("//");
+    const multiIndex = data.indexOf("/*");
+    const singleIndex = data.indexOf("//");
 
     if (multiIndex !== -1 && (multiIndex < singleIndex || singleIndex === -1)) {
       formatted += data.slice(0, multiIndex);
