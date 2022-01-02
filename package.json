@@ -1,7 +1,7 @@
 {
   "name": "huffc",
   "description": "A low level programming language for the Ethereum Virtual Machine",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": "JetJadeja",
   "bin": {
     "huffc": "bin/huffc"
