@@ -218,7 +218,11 @@ export const parseFile = (
 
         // Raise error.
         throw new SyntaxError(
-          `ParserError at ${imports[contentIndex]}(Line ${lineNumber}): Invalid Syntax`
+          `ParserError at ${imports[contentIndex]}(Line ${lineNumber}): Invalid Syntax
+          
+          ${input.slice(0, input.indexOf("\n"))}
+          ^
+          `
         );
       }
     }
