@@ -36,7 +36,7 @@ var getAllFileContents = function (filepath) {
                 return;
             var _a = getContents(importPath, imported), newIncludes = _a[0], newImports = _a[1];
             // Add the file contents to the includes array.
-            includes = __spreadArray(__spreadArray([], includes, true), newIncludes, true);
+            includes = __spreadArray(__spreadArray([], newIncludes, true), includes, true);
             // Add the file to the imports array.
             imports = __spreadArray(__spreadArray([], files, true), newImports, true);
             // Mark the file as imported.

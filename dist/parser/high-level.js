@@ -157,7 +157,7 @@ var parseFile = function (filePath) {
                 // Get the line number of the file.
                 var lineNumber = content.substring(0, index).split("\n").length;
                 // Raise error.
-                throw new SyntaxError("ParserError at ".concat(imports[contentIndex], "(Line ").concat(lineNumber, "): Invalid Syntax"));
+                throw new SyntaxError("ParserError at ".concat(imports[contentIndex], "(Line ").concat(lineNumber, "): Invalid Syntax\n          \n          ").concat(input.slice(0, input.indexOf("\n")), "\n          ^\n          "));
             }
         }
     });

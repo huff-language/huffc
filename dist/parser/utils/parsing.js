@@ -12,8 +12,8 @@ var removeComments = function (string) {
     var data = string;
     var formatted = "";
     while (!(0, regex_1.isEndOfData)(data)) {
-        var multiIndex = data.indexOf("/*") === 0 ? 1 : data.indexOf("/*");
-        var singleIndex = data.indexOf("//") === 0 ? 1 : data.indexOf("//");
+        var multiIndex = data.indexOf("/*");
+        var singleIndex = data.indexOf("//");
         if (multiIndex !== -1 && (multiIndex < singleIndex || singleIndex === -1)) {
             formatted += data.slice(0, multiIndex);
             var endBlock = data.indexOf("*/");
