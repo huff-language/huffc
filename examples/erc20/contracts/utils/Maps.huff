@@ -1,34 +1,30 @@
 /* Macros */
 
 // Given a piece of data (ie an address), hash it, generating a key for a hashmap.
-#define macro GET_KEY() = takes(2) returns (1) {
-    // Input stack: [memory_location, data]
+#define macro GET_KEY(mem_ptr) = takes(1) returns (1) {
+    // Input stack: [data]
     // Load the data into memory and hash it, while preserving the memory location.
-    swap1   // [data, memory_location]
-    dup2    // [memory_location, data, memory_location]
-    mstore  // [memory_location]
+    [mem_ptr]   // [mem_ptr, data]
+    mstore      // []
     
     // Hash the data, generating a key.
-    0x20    // [32, memory_location]
-    swap1   // [memory_location, 32]
-    sha3    // [key]
+    0x20                // [32]
+    [mem_ptr]           // [mem_ptr, 32]
+    sha3                // [key]
 }
 
 // Given two pieces of data (ie an address and a number), hash them together, generating a key for a secondary hashmap.
 // This should only be used if you have multiple maps in your contract.
-#define macro GET_SECONDARY_KEY() = takes(3) returns (1) {
-    // Input stack: [memory_location, data1, data2]
-    // Load the data into memory and hash it, while preserving the memory location.
-    swap1       // [data1, memory_location, data2]
-    dup2        // [memory_location, data1, memory_location, data2]
-    mstore      // [memory_location, data2]
-    swap1       // [data2, memory_location]
-    dup2        // [memory_location, data2, memory_location]
-    0x20 add    // [memory_location + 32, data2, memory_location]
-    mstore      // [memory_location]
+#define macro GET_SECONDARY_KEY(mem_ptr) = takes(2) returns (1) {
+    // Input stack: [data1, data2]
+    // Load the data into memory.
+    [mem_ptr]           // [mem_ptr, data1, data2]
+    mstore              // [data2]
+    [mem_ptr] 0x20 add  // [mem_ptr + 32, data2]
+    mstore              // []
     
     // Hash the data, generating a key.
-    0x40    // [64, memory_location]
-    swap1   // [memory_location, 64]
-    sha3    // [key]
+    0x40        // [64]
+    [mem_ptr]   // [mem_ptr, 64]
+    sha3        // [key]
 }
