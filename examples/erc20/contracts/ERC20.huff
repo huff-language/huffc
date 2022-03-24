@@ -1,0 +1,29 @@
+
+/* Imports */
+#include "./contracts/utils/Ownable.huff"
+#include "./contracts/utils/Address.huff"
+#include "./contracts/utils/Utils.huff"
+
+/* Interface */
+
+/* Events Signatures */
+#define constant TRANSFER_EVENT_SIGNATURE = 0xDDF252AD1BE2C89B69C2B068FC378DAA952BA7F163C4A11628F55A4DF523B3EF
+#define constant APPROVAL_EVENT_SIGNATURE = 0x8C5BE1E5EBEC7D5BD14F71427D1E84F3DD0314C0F7B2291E5B200AC8C7C3B925
+
+/* Storage Slots */
+#define constant BALANCE_LOCATION = FREE_STORAGE_POINTER() // Will not be used.
+#define constant ALLOWANCE_LOCATION = FREE_STORAGE_POINTER()
+#define constant TOTAL_SUPPLY_LOCATION = FREE_STORAGE_POINTER()
+
+/* Constructor */
+
+#define macro CONSTRUCTOR() = takes(0) returns (0) {
+    // Set msg.sender as the owner of the contract.
+    OWNABLE_CONSTRUCTOR()
+}
+
+
+/* TRANSFER FUNCTIONALITY */
+#define macro TRANSFER_TAKE_FROM(error) = takes(0) returns (0) {
+    // Get the updated balance of the sender. 
+}
