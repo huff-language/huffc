@@ -42,6 +42,11 @@ export const processMacro = (
     switch (operation.type) {
       // We're parsing a macro call.
       case OperationType.MACRO_CALL: {
+        // Replace macro arguments with their values.
+        operation.args.map((arg: string, index: number) => {
+          if (arg.startsWith("<") && arg.endsWith(">")) operation.args[index] = args[index];
+        });
+
         // Process the macro call.
         const result = processMacro(
           operation.value,
