@@ -3,6 +3,7 @@
 #include "./contracts/utils/Ownable.huff"
 #include "./contracts/utils/Address.huff"
 #include "./contracts/utils/Utils.huff"
+#include "./contracts/utils/HashMap.huff"
 
 /* Interface */
 
@@ -11,7 +12,7 @@
 #define constant APPROVAL_EVENT_SIGNATURE = 0x8C5BE1E5EBEC7D5BD14F71427D1E84F3DD0314C0F7B2291E5B200AC8C7C3B925
 
 /* Storage Slots */
-#define constant BALANCE_LOCATION = FREE_STORAGE_POINTER() // Will not be used.
+#define constant BALANCE_LOCATION = FREE_STORAGE_POINTER()
 #define constant ALLOWANCE_LOCATION = FREE_STORAGE_POINTER()
 #define constant TOTAL_SUPPLY_LOCATION = FREE_STORAGE_POINTER()
 
@@ -24,6 +25,28 @@
 
 
 /* TRANSFER FUNCTIONALITY */
-#define macro TRANSFER_TAKE_FROM(error) = takes(0) returns (0) {
-    // Get the updated balance of the sender. 
+#define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (0) {
+    // Ensure that the sender has a sufficient balance.
+    // input stack: [value, from, to]
+    dup2                // [from, value, from, to]
+    LOAD_ELEMENT(0x00)  // [balance, value, from, to]
+    dup1                // [balance, balance, value, from, to]
+    dup3                // [value, balance, balance, value, from, to]
+    gt                  // [value>balance, balance, value, from, to]              
+    <error> jumpi       // [balance, value, from, to]
+
+    // Update the sender's balance.
+    // input stack: [balance, value, from, to]
+    dup2                // [value, balance, value, from, to]
+    swap1               // [balance, value, value, from, to]
+    sub                 // [balance - value, value, from, to]
+    dup3                // [from, balance-value, value, from, to]
+    STORE_ELEMENT(0x00) // [value, from, to]
+}
+
+#define macro TRANSFER() = takes(0) returns(1) {
+    // Setup the stack for the transfer function.
+    0x04 calldataload   // [to]
+    caller              // [from, to]
+    0x24 calldataload   // [value, from, to]
 }
