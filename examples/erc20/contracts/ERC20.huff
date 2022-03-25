@@ -25,7 +25,7 @@
 
 
 /* TRANSFER FUNCTIONALITY */
-#define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (0) {
+#define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (3) {
     // Ensure that the sender has a sufficient balance.
     // input stack: [value, from, to]
     dup2                // [from, value, from, to]
@@ -44,9 +44,39 @@
     STORE_ELEMENT(0x00) // [value, from, to]
 }
 
+#define macro TRANSFER_GIVE_TO() = takes(3) returns (0) {
+    // Update the balance of the recipient.
+    // input stack: [value, from, to]
+    dup3                // [to, value, from, to]
+    dup2                // [value, to, value, from, to]
+    swap1               // [to, value, value, from, to]
+    LOAD_ELEMENT(0x00)  // [balance, value, value, from, to]
+    add                 // [balance+value, value, from, to]
+    dup3                // [to, balance+value, value, from, to]
+    STORE_ELEMENT(0x00) // [value, from, to]
+}
+
 #define macro TRANSFER() = takes(0) returns(1) {
     // Setup the stack for the transfer function.
     0x04 calldataload   // [to]
     caller              // [from, to]
     0x24 calldataload   // [value, from, to]
+
+    // Update the balances of the sender and recipient.
+    TRANSFER_TAKE_FROM(error)   // [value, from, to]
+    TRANSFER_GIVE_TO()          // [value, from, to]
+
+    // Emit the transfer event.
+    0x00 mstore                 // [from, to]
+    [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
+    0x20 0x00                   // [0, 32, sig, from, to]
+    log3                        // []
+
+    // Return "1" to represent a succesful transfer.
+    0x01 0x00 mstore
+    0x20 0x00 return 
+
+    // Error destination.
+    error:
+        0x00 0x00 revert
 }
