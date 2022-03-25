@@ -21,6 +21,22 @@ While Huff can be used by EVM experts to design highly-efficient smart contracts
 }
 ```
 
-# Documentation and Tutorials
+# Setup
 
-Coming soon
+To run this project, install it using npm
+
+```
+npm install -g huffc
+```
+
+To compile a contract and output its bytecode, simply run
+
+```
+huffc filename.huff --bytecode
+```
+
+For a full list of arguments, run
+
+```
+huffc --help
+```
