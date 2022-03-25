@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "hardhat-huff": "^1.0.15",
-    "huffc": "0.0.16"
+    "huffc": "0.0.17"
   }
 }

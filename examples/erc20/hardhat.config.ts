@@ -19,6 +19,6 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 export default {
   solidity: "0.7.3",
   huff: {
-    version: "0.0.16",
+    version: "0.0.17",
   },
 };
