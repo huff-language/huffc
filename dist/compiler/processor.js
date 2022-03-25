@@ -55,6 +55,11 @@ var processMacro = function (name, bytecodeOffset, args, macros, constants, jump
         switch (operation.type) {
             // We're parsing a macro call.
             case types_1.OperationType.MACRO_CALL: {
+                // Replace macro arguments with their values.
+                operation.args.map(function (arg, index) {
+                    if (arg.startsWith("<") && arg.endsWith(">"))
+                        operation.args[index] = args[index];
+                });
                 // Process the macro call.
                 var result = (0, exports.processMacro)(operation.value, offset, operation.args, macros, constants, jumptables);
                 // Add the result to local variables.
