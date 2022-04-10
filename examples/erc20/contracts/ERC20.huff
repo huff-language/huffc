@@ -36,7 +36,7 @@
 }
 
 
-/* TRANSFER FUNCTIONALITY */
+/* Transfer Functions */
 #define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (3) {
     // Ensure that the sender has a sufficient balance.
     // input stack: [value, from, to]
@@ -93,12 +93,35 @@
         0x00 0x00 revert
 }
 
+/* Mint Functions */
+#define macro MINT() = takes(0) returns (0) {
+    // Ensure that the sender is the owner of the contract.
+    ONLY_OWNER()
+
+    // Setup the stack for the mint function.
+    0x04 calldataload   // [to]
+    0x00                // [from (0x00), to]
+    0x24 calldataload   // [value, from, to]
+
+    // Give tokens to the recipient.
+    TRANSFER_GIVE_TO()  // [value, from, to]
+
+    // Emit the transfer event.
+    0x00 mstore                 // [from, to]
+    [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
+    0x20 0x00                   // [0, 32, sig, from, to]
+    log3                        // []
+}
+
 // Main Macro
 #define macro MAIN() = takes(0) returns (0) {
     // Identify which function is being called.
     0x00 calldataload 0xE0 shr
     dup1 0xa9059cbb eq transfer jumpi
+    dup1 0x40c10f19 eq mint jumpi
 
     transfer:
         TRANSFER()
+    mint:
+        MINT()
 }
