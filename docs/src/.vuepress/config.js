@@ -15,6 +15,7 @@ module.exports = {
     nav: [
       { text: "Home", link: "/" },
       { text: "Get Started", link: "/get-started/" },
+      { text: "Tutorial", link: "/tutorial/overview/" },
     ],
     sidebarDepth: 10,
     sidebar: {
@@ -22,11 +23,18 @@ module.exports = {
         {
           title: "Get Started",
           collapsable: false,
+        },
+      ],
+
+      "/tutorial/": [
+        {
+          title: "Tutorial",
+          collapsable: false,
           children: [
-            "/get-started/introduction/",
-            "/get-started/installation/",
-            "/get-started/evm-basics/",
-            "/get-started/first-contract/",
+            "/tutorial/overview/",
+            "/tutorial/evm-basics/",
+            "/tutorial/setup/",
+            "/tutorial/new-project/",
           ],
         },
       ],

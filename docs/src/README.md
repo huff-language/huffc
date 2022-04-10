@@ -4,5 +4,5 @@ heroImage: https://t3.ftcdn.net/jpg/02/00/32/66/360_F_200326685_fFj2wZJBgrPYrDFc
 heroText: Huff
 tagline: Low level EVM Programming Language.
 actionText: Get Started →
-actionLink: /get-started/introduction/
+actionLink: /get-started/
 ---
