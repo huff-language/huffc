@@ -1,27 +1,42 @@
-## **Huff**: a low level programming language for the Ethereum Virtual Machine
+# The Huff Programming Language
 
-<p align="center"><img src="https://i.imgur.com/SVRjUhU.png" width="640px"/></p>
+<img src="https://i.imgur.com/I9IkxuW.png" height="180">
 
-Huff is a domain-specific programming language created for the purpose of writing highly optimized code for the Ethereum Virtual Machine. It enables the construction of EVM assembly "macros" - individual blocks of bytecode that can be rigorously tested and evaluated.
+Huff is a low-level programming language, designed for developing highly optimized smart contracts that run on the Ethereum Virtual Machine. Huff does not hide the inner-workings of the EVM, instead, directly exposing its programming stack to the developer for manual manipulation.
 
-Huff barely hides the inner-workings of the EVM behind syntactic sugar. Rather than having variables, Huff directly exposes the EVM's program stack to the developer to be manually manipulated.
+Rather than having functions, Huff has macros - individual blocks of bytecode that can be rigorously tested and evaluated using the Huff runtime testing suite.
 
-### **"That sounds terrible! Why learn Huff?"**
+Originally developed by the Aztec Protocol team, Huff was developed to write [Weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules), an on-chain eliptical curve arithmetic library that required code so optimized, that it could not be written in Solidity, or even Yul.
 
-Huff was orginally developed by [Aztec Protocol](https://github.com/AztecProtocol) to create [Weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules), an elliptic curve arithmetic library that required extremely optimized code.
+While Huff can be used by EVM experts to design highly-efficient smart contracts for use in production, it can also serve as a way for beginners to learn more about the Ethereum Virtual Machine, projects built on it, and languages made for it.
 
-Huff is designed for developing extremely optimized smart contract code, where the direct manipulation of the program's bytecode is preferred. Using the Huff runtime testing suite, Huff macros can be rigorously tested without having to split the program into functions and invoke jump instructions.
+## Example
 
-Beyond writing performant code, learning Huff can help you learn all about the Ethereum Virtual Machine as well as develop your understanding of other EVM programming languages like Solidity and Vyper.
+"Hello World" in Huff:
 
-### **"Where can I find example Huff code?"**
+```js
+#define macro MAIN() = takes (0) returns (0) {
+    0x48656c6c6f2c20776f726c6421 0x00 mstore // Store "Hello, World!" in memory.
+    0x1a 0x00 return // Return 26 bytes starting from memory pointer 0.
+}
+```
 
-[ERC20](https://github.com/JetJadeja/huff/blob/master/example/erc20/erc20.huff), the ERC20 token standard written entirely in Huff.
+# Setup
 
-[Minisig.huff](https://github.com/wolflo/minisig.huff) is a minimal multisignature wallet written in Huff.
+To run this project, install it using npm
 
-[EVM-Hypervisor](https://github.com/d1ll0n/evm-hypervisor) is an EVM emulator, allowing you to execute the logic of another contract without using `DELEGATECALL`.
+```
+npm install -g huffc
+```
 
-[Proxies.huff](https://github.com/wolflo/proxies.huff), a collection of different Huff proxy implementations.
+To compile a contract and output its bytecode, simply run
 
-[weierstrudel](https://github.com/AztecProtocol/weierstrudel/tree/master/huff_modules) is an elliptic curve arithmetic library written entirely in Huff, with its contract code totalling over 14kb.
+```
+huffc filename.huff --bytecode
+```
+
+For a full list of arguments, run
+
+```
+huffc --help
+```

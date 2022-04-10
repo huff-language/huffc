@@ -1,68 +1,50 @@
 import { program } from "commander";
-import compiler from "./huff/compiler";
+import compile from "./";
+import fs = require("fs");
 
-console.log("");
+// Compiler Version
+const version = "2.0.0";
 
+// Define terminal commands.
+program.name("huffc");
+program.version(version);
 program
-  .option("-a, --args <args>", "arguments", "")
-  .option("-d, --dir <dir>", "default directory for contracts", "./");
+  .option("-V, --version", "Show the version and exit")
+  .option("--base-path <path>", "The base path to the contracts", "./")
+  .option("--output-directory <output-dir>", "The output directory", "./")
+  .option("--bytecode", "Generate and log bytecode", false)
+  .option("-o, output", "The output file")
+  .option("-p, --paste", "Paste the output to the terminal");
 
+// Parse the terminal arguments.
 program.parse(process.argv);
 const options = program.opts();
 
-const command = process.argv[2];
+var files = program.args;
+var destination = options.outputDir || ".";
 
-if (command === "compile") {
-  const errors = [];
+// Abort the program.
+const abort = (msg) => {
+  console.error(msg || "Error occured");
+  process.exit(1);
+};
 
-  for (let i = 3; i < process.argv.length; i++) {
-    const file = process.argv[i];
-    const path = file.split("/");
+// Iterate the imported files.
+files.forEach((file) => {
+  // Abort if the file extension is not .huff.
+  if (!file.endsWith(".huff")) abort("File extension must be .huff");
 
-    if (file.startsWith("--")) continue;
+  // Compile the file.
+  const result = compile({
+    filePath: file,
+    generateAbi: true,
+  });
 
-    try {
-      console.log("-----------------------------");
-      console.log(`\x1b[1mCompiling ${path[path.length - 1]}`, "\n\x1b[0m");
-      const code = `0x${compiler(process.argv[i], options.dir, options.args)}`;
-      console.log("\x1b[32m", "Compiled Sucessfully", "\x1b[0m");
-      console.log(code, "\n");
-    } catch (e) {
-      errors.push(e);
-    }
-  }
+  // If the user has specified an output file, write the output to the file.
+  const outputPath = `${options.outputDirectory}${files[0].replace(".huff", ".json")}`;
+  if (options.output) fs.writeFileSync(outputPath, result.abi);
 
-  for (let i = 0; i < errors.length; i++) {
-    console.log(errors[i]);
-  }
-} else if (command === "help" || !command) {
-  console.log(`
-                                                                                    
-                                                                                
-                                     (@@@/                                      
-                                 &&&&&@#&&&&&&&                                 
-                               &&&&&&&&&&&&&&                                   
-                                &&&&&&@&&&&@&&                                  
-                              @#&&&& &&&&&&&&&&                                 
-                              &&@&&&@&&&@&&&&&&&                                
-                               &&&&&@&&.@   &&&@                                
-                               @&@&&&&&&&.@.                                    
-                                &.&&&&&&&&&.&&                                  
-                                &@&&&&&&&&&& &&                                 
-                                 &&&&&&&&&&&&&                                  
-                                  &&&&&&&&&&&%                                  
-                                   &&&&&&&&&&                                   
-                                 %&&&&&&&&&&&&                                  
-                               &&&&&&&&&&&&%%%%&                                
-                                                      
-  `);
-  console.log(`
-                             _    _        __  __ 
-                            | |  | |      / _|/ _|
-                            | |__| |_   _| |_| |_ 
-                            |  __  | | | |  _|  _|
-                            | |  | | |_| | | | |  
-                            |_|  |_|\__,_|_| |_|  
-                        
-  `);
-}
+  // If the user has specified for us to log the bytecode, log it.
+  if (options.bytecode && !options.paste) console.log(result.bytecode);
+  if (options.paste) console.log(result);
+});

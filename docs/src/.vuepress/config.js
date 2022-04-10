@@ -39,6 +39,7 @@ module.exports = {
         },
       ],
     },
+    sidebar: "auto",
     smoothScroll: true,
   },
 };

@@ -26,6 +26,7 @@ Here are the full list of arguments:
 
 ```
 Usage: huffc [options]
+
 Options:
   -V, --version                    output the version number
   -V, --version                    Show the version and exit
@@ -42,7 +43,8 @@ Options:
 You may use Huff from the command line or with Hardhat, a development environment for compiling, deploying, testing, and debugging smart contracts. With Hardhat, you can do things like automate compilation, write and run unit tests, deploy to mainnet, and much more.
 
 > **_NOTE:_** The rest of the documentation will assume that you are using Hardhat
-> To use Huff and Hardhat together, you must use the Hardhat Huff project template, which may be found [here](https://github.com/JetJadeja/huff-project-template). Once you have created a repository using the template, you can install the necessary packages by running:
+
+To use Huff and Hardhat together, you must use the Hardhat Huff project template, which may be found [here](https://github.com/JetJadeja/huff-project-template). Once you have created a repository using the template, you can install the necessary packages by running:
 
 ```sh
 npm install

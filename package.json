@@ -1,10 +1,10 @@
 {
-  "name": "huff-language",
-  "description": "A compiler for Huff, a low-level programming language for the Ethereum Virtual Machine",
-  "version": "0.0.1",
+  "name": "huffc",
+  "description": "A low level programming language for the Ethereum Virtual Machine",
+  "version": "0.0.21",
   "author": "JetJadeja",
   "bin": {
-    "huff": "bin/huff"
+    "huffc": "bin/huffc"
   },
   "dependencies": {
     "bn.js": "^4.11.8",
@@ -12,7 +12,7 @@
     "ethereumjs-vm": "^2.5.1",
     "ethers": "^5.4.2",
     "ts-node": "^10.1.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -38,12 +38,13 @@
     "smart-contracts"
   ],
   "license": "LGPL-3.0",
-  "main": "./src",
+  "main": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JetJadeja/huff.git"
   },
   "scripts": {
+    "build": "tsc",
     "lint": "eslint --ignore-path ./.eslintignore .",
     "test": "mocha ./src/ --bail --colors --exit --recursive --reporter spec --trace-warnings",
     "exampletest": "mocha ./example/ --bail --colors --exit --recursive --reporter spec --trace-warnings"
