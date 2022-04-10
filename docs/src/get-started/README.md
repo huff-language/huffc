@@ -22,6 +22,39 @@ To compile a Huff contract and output its bytecode from the command line, you ca
 huffc compile filename.huff --bytecode
 ```
 
-## Project Quickstart
+Here are the full list of arguments:
 
-While Huff can be used via the command-line, if you plan on having a project
+```
+Usage: huffc [options]
+
+Options:
+  -V, --version                    output the version number
+  -V, --version                    Show the version and exit
+  --base-path <path>               The base path to the contracts (default: "./")
+  --output-directory <output-dir>  The output directory (default: "./")
+  --bytecode                       Generate and log bytecode (default: false)
+  -o, output                       The output file
+  -p, --paste                      Paste the output to the terminal
+  -h, --help                       display help for command
+```
+
+## Hardhat Quickstart
+
+You may use Huff from the command line or with Hardhat, a development environment for compiling, deploying, testing, and debugging smart contracts. With Hardhat, you can do things like automate compilation, write and run unit tests, deploy to mainnet, and much more.
+
+> **_NOTE:_** The rest of the documentation will assume that you are using Hardhat
+
+To use Huff and Hardhat together, you must use the Hardhat Huff project template, which may be found [here](https://github.com/JetJadeja/huff-project-template). Once you have created a repository using the template, you can install the necessary packages by running:
+
+```sh
+npm install
+```
+
+To compile and test the contracts you can run the following commands respectively:
+
+```sh
+npx hardhat compile
+npx hardhat test
+```
+
+For more information on how to use Hardhat, check out their documentation, located [here](https://hardhat.org/getting-started/).
