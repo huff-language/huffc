@@ -6,8 +6,7 @@
 #include "./contracts/utils/HashMap.huff"
 
 /* Interface */
-#define function mint(address,uint256) view returns ()
-
+#define function mint(address,uint256) nonpayable returns ()
 #define function transfer(address,uint256) nonpayable returns ()
 #define function transferFrom(address,address,uint256) nonpayable returns ()
 #define function approve(address,uint256) nonpayable returns ()
