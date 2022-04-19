@@ -35,15 +35,9 @@
     OWNABLE_CONSTRUCTOR()
 }
 
-#define macro SET_BALANCE() = takes (0) returns (0) {
-    0x24 calldataload       // [value]
-    0x04 calldataload       // [key, value]
-    STORE_ELEMENT(0x00)
-}
-
 #define macro BALANCE_OF() = takes (0) returns (0) {
     0x04 calldataload       // [account]
-    LOAD_ELEMENT(0x00)      // [balance]
+    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)      // [balance]
 
     0x00 mstore             // []
 
@@ -56,13 +50,24 @@
     0x20 0x00 return
 }
 
+#define macro ALLOWANCE() = takes (0) returns (0) {
+    0x24 calldataload       // [to]
+    0x04 calldataload       // [from, to]
+
+    LOAD_ELEMENT_FROM_KEYS(0x00)    // [value]
+
+    0x00 mstore
+
+    0x20 0x00 return
+}
+
 
 /* Transfer Functions */
 #define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (3) {
     // Ensure that the sender has a sufficient balance.
     // input stack: [value, from, to]
     dup2                // [from, value, from, to]
-    LOAD_ELEMENT(0x00)  // [balance, value, from, to]
+    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)  // [balance, value, from, to]
     dup1                // [balance, balance, value, from, to]
     dup3                // [value, balance, balance, value, from, to]
     gt                  // [value>balance, balance, value, from, to]              
@@ -74,7 +79,7 @@
     swap1               // [balance, value, value, from, to]
     sub                 // [balance - value, value, from, to]
     dup3                // [from, balance-value, value, from, to]
-    STORE_ELEMENT(0x00) // [value, from, to]
+    [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00) // [value, from, to]
 }
 
 #define macro TRANSFER_GIVE_TO() = takes(3) returns (0) {
@@ -83,10 +88,18 @@
     dup3                // [to, value, from, to]
     dup2                // [value, to, value, from, to]
     swap1               // [to, value, value, from, to]
-    LOAD_ELEMENT(0x00)  // [balance, value, value, from, to]
+    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)  // [balance, value, value, from, to]
     add                 // [balance+value, value, from, to]
     dup4                // [to, balance+value, value, from, to]
-    STORE_ELEMENT(0x00) // [value, from, to]
+    [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00) // [value, from, to]
+}
+
+#define macro APPROVE() = takes (0) returns (0) {
+    0x24 calldataload       // [value]
+    0x04 calldataload       // [to, value]
+    caller                  // [from, to, value]
+
+    STORE_ELEMENT_FROM_KEYS(0x00) 
 }
 
 #define macro TRANSFER() = takes(0) returns(1) {
@@ -128,11 +141,10 @@
     TRANSFER_GIVE_TO()  // [value, from, to]
 
     // Update totalSupply
-    dup1                        // [value, value, from, to]
-    [TOTAL_SUPPLY_LOCATION]     // [ptr, value, value, from, to]
-    sload                       // [supply,value,value,from,to]
-    add                         // [supply+value,value,from,to]
-    [TOTAL_SUPPLY_LOCATION] sstore // [value,from,to]
+    dup1                            // [value, value, from, to]
+    [TOTAL_SUPPLY_LOCATION] sload    // [supply,value,value,from,to]
+    add                             // [supply+value,value,from,to]
+    [TOTAL_SUPPLY_LOCATION] sstore  // [value,from,to]
 
 
     // Emit the transfer event.
@@ -150,6 +162,8 @@
     dup1 0x40c10f19 eq mints jumpi
     dup1 0x70a08231 eq balanceOf jumpi
     dup1 0x18160ddd eq totalSupply jumpi
+    dup1 0x095ea7b3 eq approve jumpi
+    dup1 0xdd62ed3e eq allowance jumpi
 
     transfer:
         TRANSFER()
@@ -159,5 +173,9 @@
         BALANCE_OF()
     totalSupply:
         TOTAL_SUPPLY()
+    approve:
+        APPROVE()
+    allowance:
+        ALLOWANCE()
 
 }
