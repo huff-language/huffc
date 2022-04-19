@@ -50,6 +50,12 @@
     0x20 0x00 return
 }
 
+#define macro TOTAL_SUPPLY() = takes (0) returns (0) {
+    [TOTAL_SUPPLY_LOCATION] sload // [supply]
+    0x00 mstore
+    0x20 0x00 return
+}
+
 
 /* Transfer Functions */
 #define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (3) {
@@ -121,6 +127,14 @@
     // Give tokens to the recipient.
     TRANSFER_GIVE_TO()  // [value, from, to]
 
+    // Update totalSupply
+    dup1                        // [value, value, from, to]
+    [TOTAL_SUPPLY_LOCATION]     // [ptr, value, value, from, to]
+    sload                       // [supply,value,value,from,to]
+    add                         // [supply+value,value,from,to]
+    [TOTAL_SUPPLY_LOCATION] sstore // [value,from,to]
+
+
     // Emit the transfer event.
     0x00 mstore                 // [from, to]
     [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
@@ -135,6 +149,7 @@
     dup1 0xa9059cbb eq transfer jumpi
     dup1 0x40c10f19 eq mints jumpi
     dup1 0x70a08231 eq balanceOf jumpi
+    dup1 0x18160ddd eq totalSupply jumpi
 
     transfer:
         TRANSFER()
@@ -142,5 +157,7 @@
         MINT()
     balanceOf:
         BALANCE_OF()
+    totalSupply:
+        TOTAL_SUPPLY()
 
 }
