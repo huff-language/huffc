@@ -7,6 +7,7 @@
 
 /* Interface */
 #define function mint(address,uint256) nonpayable returns ()
+
 #define function transfer(address,uint256) nonpayable returns ()
 #define function transferFrom(address,address,uint256) nonpayable returns ()
 #define function approve(address,uint256) nonpayable returns ()
@@ -32,6 +33,21 @@
 #define macro CONSTRUCTOR() = takes(0) returns (0) {
     // Set msg.sender as the owner of the contract.
     OWNABLE_CONSTRUCTOR()
+}
+
+#define macro SET_BALANCE() = takes (0) returns (0) {
+    0x24 calldataload       // [value]
+    0x04 calldataload       // [key, value]
+    STORE_ELEMENT(0x00)
+}
+
+#define macro BALANCE_OF() = takes (0) returns (0) {
+    0x04 calldataload       // [account]
+    LOAD_ELEMENT(0x00)      // [balance]
+
+    0x00 mstore             // []
+
+    0x20 0x00 return
 }
 
 
@@ -63,7 +79,7 @@
     swap1               // [to, value, value, from, to]
     LOAD_ELEMENT(0x00)  // [balance, value, value, from, to]
     add                 // [balance+value, value, from, to]
-    dup3                // [to, balance+value, value, from, to]
+    dup4                // [to, balance+value, value, from, to]
     STORE_ELEMENT(0x00) // [value, from, to]
 }
 
@@ -117,10 +133,14 @@
     // Identify which function is being called.
     0x00 calldataload 0xE0 shr
     dup1 0xa9059cbb eq transfer jumpi
-    dup1 0x40c10f19 eq mint jumpi
+    dup1 0x40c10f19 eq mints jumpi
+    dup1 0x70a08231 eq balanceOf jumpi
 
     transfer:
         TRANSFER()
-    mint:
+    mints:
         MINT()
+    balanceOf:
+        BALANCE_OF()
+
 }
