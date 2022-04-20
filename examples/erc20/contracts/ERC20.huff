@@ -35,29 +35,26 @@
     OWNABLE_CONSTRUCTOR()
 }
 
+/* Accounting Functions */
 #define macro BALANCE_OF() = takes (0) returns (0) {
-    0x04 calldataload       // [account]
-    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)      // [balance]
-
-    0x00 mstore             // []
-
-    0x20 0x00 return
+    0x04 calldataload                               // [account]
+    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00) // [balance]
+    0x00 mstore                                     // []
+    0x20 0x00 return                                // []
 }
 
 #define macro TOTAL_SUPPLY() = takes (0) returns (0) {
-    [TOTAL_SUPPLY_LOCATION] sload // [supply]
-    0x00 mstore
-    0x20 0x00 return
+    [TOTAL_SUPPLY_LOCATION] sload   // [supply]
+    0x00 mstore                     // []
+    0x20 0x00 return                // []
 }
 
 #define macro ALLOWANCE() = takes (0) returns (0) {
-    0x24 calldataload       // [to]
-    0x04 calldataload       // [from, to]
-
+    0x24 calldataload               // [to]
+    0x04 calldataload               // [from, to]
     LOAD_ELEMENT_FROM_KEYS(0x00)    // [value]
-
+    
     0x00 mstore
-
     0x20 0x00 return
 }
 
