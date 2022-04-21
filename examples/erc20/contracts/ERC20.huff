@@ -50,11 +50,20 @@
     0x20 0x00 return
 }
 
+#define macro _ALLOWANCE() = takes (2) returns (1) {
+    // call stack [from,to]
+    LOAD_ELEMENT_FROM_KEYS(0x00)    // [value]
+
+    0x00 mstore
+
+    0x20 0x00 return
+}
+
 #define macro ALLOWANCE() = takes (0) returns (0) {
     0x24 calldataload       // [to]
     0x04 calldataload       // [from, to]
 
-    LOAD_ELEMENT_FROM_KEYS(0x00)    // [value]
+    _ALLOWANCE()    // [value]
 
     0x00 mstore
 
@@ -94,12 +103,17 @@
     [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00) // [value, from, to]
 }
 
+#define macro _APPROVE() = takes (2) returns (0) {
+    // call stack [from, to , value]
+    STORE_ELEMENT_FROM_KEYS(0x00)
+}
+
 #define macro APPROVE() = takes (0) returns (0) {
     0x24 calldataload       // [value]
     0x04 calldataload       // [to, value]
     caller                  // [from, to, value]
 
-    STORE_ELEMENT_FROM_KEYS(0x00) 
+    _APPROVE()
 }
 
 #define macro TRANSFER() = takes(0) returns(1) {
@@ -117,6 +131,52 @@
     [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
     0x20 0x00                   // [0, 32, sig, from, to]
     log3                        // []
+
+    // Return "1" to represent a succesful transfer.
+    0x01 0x00 mstore
+    0x20 0x00 return 
+
+    // Error destination.
+    error:
+        0x00 0x00 revert
+}
+
+#define macro TRANSFER_FROM() = takes (0) returns (0) {
+    0x04 calldataload       // [from]
+    0x24 calldataload       // [to, from]
+    0x44 calldataload       // [value, to, from]
+
+    dup2                    // [to, value, to, from]
+    dup4                    // [from, to, value, to, from]
+
+    // check if allowance > value
+    _ALLOWANCE()    // [allowance, value, to, from]
+    dup2                            // [value, allowance, value, to, from]
+    dup2                            // [allowance, value, allowance, value, to, from]
+    lt                              // [allowance < value, allowance, value, to, from]
+
+    // revert if allowance < value
+    error jumpi                     // [allowance, value, to, from] 
+
+    // update allowance
+    sub                              // [allowance-value, to, from]
+    swap2                              // [from, to, value]
+    dup3                             // [value,from,to,value]
+    dup3                             // [to,value,from,to,value]
+    dup3                            // [from,to,value,from,to,value]
+    _APPROVE()                          // [from,to,value]
+
+    transfer value
+    swap1                             // [to,from,value]
+    swap2                              // [value,from,to]
+    TRANSFER_TAKE_FROM(error)          // [value, from, to]
+    TRANSFER_GIVE_TO()                 // [value, from, to]
+
+    // Emit the transfer event.
+    // 0x00 mstore                 // [from, to]
+    // [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
+    // 0x20 0x00                   // [0, 32, sig, from, to]
+    // log3                        // []
 
     // Return "1" to represent a succesful transfer.
     0x01 0x00 mstore
@@ -158,6 +218,7 @@
 #define macro MAIN() = takes(0) returns (0) {
     // Identify which function is being called.
     0x00 calldataload 0xE0 shr
+    dup1 0x23b872dd eq transferFrom jumpi
     dup1 0xa9059cbb eq transfer jumpi
     dup1 0x40c10f19 eq mints jumpi
     dup1 0x70a08231 eq balanceOf jumpi
@@ -165,6 +226,8 @@
     dup1 0x095ea7b3 eq approve jumpi
     dup1 0xdd62ed3e eq allowance jumpi
 
+    transferFrom:
+        TRANSFER_FROM()
     transfer:
         TRANSFER()
     mints:
@@ -177,5 +240,4 @@
         APPROVE()
     allowance:
         ALLOWANCE()
-
 }

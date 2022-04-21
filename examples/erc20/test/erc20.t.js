@@ -53,4 +53,27 @@ describe("ERC20", () => {
 
     expect(newAllowance).to.equal(val);
   });
+
+  it("transfer from test", async () => {
+    await token.mint(owner, val);
+    // must fail without approval
+    // await expect(token.transferFrom(owner, user, 1)).to.be.reverted;
+
+    await token.approve(user, val);
+
+    let oldAllowance = await token.allowance(owner, user);
+
+    expect(oldAllowance).to.equal(val);
+
+    const toTransfer = val / 50;
+    // must succeed with half of val
+    await token.transferFrom(owner, user, val);
+
+    // allowance must get reduced
+    let newAllowance = await token.allowance(owner, user);
+    expect(newAllowance).to.equal(0);
+
+    // let userBal = await token.balanceOf(user);
+    // expect(userBal).to.equal(toTransfer);
+  });
 });
