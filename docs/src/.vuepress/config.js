@@ -32,14 +32,13 @@ module.exports = {
           collapsable: false,
           children: [
             "/tutorial/overview/",
-            "/tutorial/evm-basics/",
             "/tutorial/setup/",
-            "/tutorial/new-project/",
+            "/tutorial/evm-basics/",
+            "/tutorial/project-template/",
           ],
         },
       ],
     },
-    sidebar: "auto",
     smoothScroll: true,
   },
 };
