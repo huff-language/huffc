@@ -194,7 +194,7 @@ export const MACRO_CODE = {
     "\\(",
 
     /* Any alphanumeric combination */
-    "([a-zA-Z0-9_\\-<>]*)",
+    "([a-zA-Z0-9_, \\-<>]*)",
 
     /* Closing parenthesis */
     "\\)\\s*\\n*",
