@@ -109,7 +109,7 @@
     TRANSFER_GIVE_TO()          // [value, from, to]
 
     // Emit the transfer event.
-    pop                         // [from, to]
+    0x00 mstore                 // [from, to]
     [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
     0x20 0x00                   // [0, 32, sig, from, to]
     log3                        // []
