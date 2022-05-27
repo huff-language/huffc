@@ -242,7 +242,10 @@
 
     //check no one owns it
     [OWNER_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)   // [owner, from (0x00), to, tokenId]
-    iszero not error jumpi
+    iszero cont jumpi
+        error jump
+
+    cont:
 
     // Give tokens to the recipient.
     TRANSFER_GIVE_TO()                              // [from (0x00), to, tokenId]
@@ -251,6 +254,8 @@
     [TRANSFER_EVENT_SIGNATURE]                      // [sig, from (0x00), to, tokenId]
     0x00 0x00                                       // [0, 0, sig, from (0x00), to, tokenId]
     log4                                            // []
+
+    stop
 
     error:
         0x00 0x00 revert

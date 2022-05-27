@@ -19,8 +19,8 @@ describe("ERC721", function () {
   });
 
   it("Can mint a NFT", async function () {
-    await erc721.mint("0x000000000000000000000000000000000000daed", 0);
-    expect(await erc721.ownerOf(0)).to.equal("0x000000000000000000000000000000000000daed");
-    expect(await number.balanceOf("0x000000000000000000000000000000000000daed")).to.equal(1);
+    await erc721.mint("0x000000000000000000000000000000000000dAeD", 0);
+    expect(await erc721.ownerOf(0)).to.equal("0x000000000000000000000000000000000000dAeD");
+    expect(await erc721.balanceOf("0x000000000000000000000000000000000000dAeD")).to.equal(1);
   });
 });
