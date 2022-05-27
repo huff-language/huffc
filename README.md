@@ -26,30 +26,30 @@ This is how to output _Hello, World!_ in Huff. You must have NPM and TS-Node ins
 
 1. Install Huff globally using NPM:
 
-  ```shell
-  npm install -g huffc
-  ```
+    ```shell
+    npm install -g huffc
+    ```
 
 1. Create a file called `hello-world.huff` and enter the following content:
 
-  ```javascript
-#define macro MAIN() = takes (0) returns (0) {
-      0x48656c6c6f2c20776f726c6421 0x00 mstore // Store "Hello, World!" in memory.
-      0x1a 0x00 return // Return 26 bytes starting from memory pointer 0.
-  }
-  ```
+    ```javascript
+    #define macro MAIN() = takes (0) returns (0) {
+        0x48656c6c6f2c20776f726c6421 0x00 mstore // Store "Hello, World!" in memory.
+        0x1a 0x00 return // Return 26 bytes starting from memory pointer 0.
+    }
+    ```
 
 1. Use `huffc` to compile the contract and output bytecode:
 
-  ```shell
-  huffc hello-world.huff --bytecode
-  ```
+    ```shell
+    huffc hello-world.huff --bytecode
+    ```
 
-  This will output something like:
+    This will output something like:
 
-  ```plaintext
-  6100168061000d6000396000f36c48656c6c6f2c20776f726c6421600052601a6000f3 
-  ```
+    ```plaintext
+    6100168061000d6000396000f36c48656c6c6f2c20776f726c6421600052601a6000f3 
+    ```
 
 Run `huffc --help` to view a full list of arguments:
 
