@@ -12,6 +12,7 @@
 #define function symbol() nonpayable returns (string)
 #define function tokenURI(uint256) nonpayable returns (string)
 
+#define function mint(address,uint256) nonpayable returns ()
 #define function transfer(address,uint256) nonpayable returns ()
 #define function transferFrom(address,address,uint256) nonpayable returns ()
 #define function approve(address,uint256) nonpayable returns ()
@@ -265,7 +266,7 @@
     dup1 0x095ea7b3 eq approve jumpi
     dup1 0xa22cb465 eq setApprovalForAll jumpi
     dup1 0xdd62ed3e eq getApproved jumpi
-    dup1 0x40c10f19 eq mints jumpi
+    dup1 0x40c10f19 eq mint jumpi
     dup1 0x70a08231 eq balanceOf jumpi
     dup1 0x06fdde03 eq name jumpi
     dup1 0x95d89b41 eq symbol jumpi
@@ -281,7 +282,7 @@
         SAFE_TRANSFER_FROM()    // not implemented yet
     safeTransferFromWithData:
         SAFE_TRANSFER_FROM_WITH_DATA()  // not implemented yet
-    mints:
+    mint:
         MINT()
     balanceOf:
         BALANCE_OF()
