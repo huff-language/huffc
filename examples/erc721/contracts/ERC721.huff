@@ -79,6 +79,22 @@
     0x20 0x00 return
 }
 
+#define macro NAME() = takes (0) returns (0) {
+    0x00 0x00 revert
+}
+
+#define macro SYMBOL() = takes (0) returns (0) {
+    0x00 0x00 revert
+}
+
+#define macro TOKEN_URI() = takes (0) returns (0) {
+    0x00 0x00 revert
+}
+
+#define macro SUPPORTS_INTERFACE() = takes (0) returns (0) {
+    0x00 0x00 revert
+}
+
 /// >>>>>>>>>>>>>>>>>>>>>  EXTERNAL FUNCTIONS  <<<<<<<<<<<<<<<<<<<<<< ///
 
 /* Transfer Functions */
@@ -110,7 +126,7 @@
     0x01 dup2                                       // [from, 1, from, to, tokenId]
     [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00) // [balance, 1, from, to, tokenId]
     sub                                             // [balance-1, from, to, tokenId]
-    [BALANCE_LOCATION] STORE_ELEMENT_IN_KEYS(0x00)  // [from, to, tokenId]
+    [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00)  // [from, to, tokenId]
 
 }
 
@@ -120,7 +136,7 @@
     dup2                            // [to, from, to, tokenId]
 	[BALANCE_LOCATION]
     LOAD_ELEMENT_FROM_KEYS(0x00)    // [balance, from, to, tokenId]
-    push 0x01                       // [balance+1, from, to, tokenId]
+    0x01 add                        // [balance+1, from, to, tokenId]
     // update balance
 	dup3                            // [to, balance+1, from, to, tokenId]
     [BALANCE_LOCATION]
@@ -130,7 +146,7 @@
     dup2                            // [to, from, to, tokenId]
     dup4                            // [tokenId, to, from, to, tokenId]
     [OWNER_LOCATION]
-    STORE_ELEMENT_IN_KEYS(0x00)     // [from, to, tokenId]
+    STORE_ELEMENT_FROM_KEYS(0x00)     // [from, to, tokenId]
 }
 
 #define macro APPROVE() = takes (0) returns (0) {
@@ -202,6 +218,14 @@
     // Error destination.
     error:
         0x00 0x00 revert
+}
+
+#define macro SAFE_TRANSFER_FROM() = takes(0) returns (0) {
+    0x00 0x00 revert
+}
+
+#define macro SAFE_TRANSFER_FROM_WITH_DATA() = takes(0) returns (0) {
+    0x00 0x00 revert
 }
 
 /* Mint Functions */
