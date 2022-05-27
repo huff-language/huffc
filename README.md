@@ -22,7 +22,7 @@ Make sure you have the following programs installed:
 
 ### Steps
 
-This is how to output _Hello, World!_ in Huff. You must have NPM and TS-Node installed.
+This is how to create the contract bytecode to output _Hello, World!_ in Huff.
 
 1. Install Huff globally using NPM:
 
@@ -50,6 +50,8 @@ This is how to output _Hello, World!_ in Huff. You must have NPM and TS-Node ins
     ```plaintext
     6100168061000d6000396000f36c48656c6c6f2c20776f726c6421600052601a6000f3 
     ```
+
+## More help
 
 Run `huffc --help` to view a full list of arguments:
 

@@ -12,19 +12,19 @@ While Huff can be used by EVM experts to design highly-efficient smart contracts
 
 If you plan on using Huff from the command line, you can use the `Huffc` package, which can be installed using [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). To install it globally, simply run:
 
-```sh
+```shell
 npm install -g huffc
 ```
 
 To compile a Huff contract and output its bytecode from the command line, you can run:
 
-```sh
+```shell
 huffc compile filename.huff --bytecode
 ```
 
 Here are the full list of arguments:
 
-```
+```plaintext
 Usage: huffc [options]
 
 Options:
