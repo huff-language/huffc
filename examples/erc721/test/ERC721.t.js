@@ -56,4 +56,34 @@ describe("ERC721", function () {
     expect(await erc721.getApproved(1337)).to.equal(ADDRESS0);
     expect(await erc721.balanceOf(from)).to.equal(0);
   });
+
+  it("Can transerFrom as self", async function () {
+
+    await erc721.mint(owner.address, 1337);
+    await erc721.transferFrom(owner.address, DEAD, 1337);
+
+    expect(await erc721.ownerOf(1337)).to.equal(DEAD);
+    expect(await erc721.balanceOf(DEAD)).to.equal(1);
+    expect(await erc721.getApproved(1337)).to.equal(ADDRESS0);
+    expect(await erc721.balanceOf(owner.address)).to.equal(0);
+  });
+
+  it("Cannot double mint", async function() {
+    await erc721.mint(owner.address, 1337);
+    await expect(erc721.mint(owner.address, 1337)).to.be.reverted;
+  });
+
+  it("Cannot approve unminted", async function() {
+    await expect(erc721.approve(DEAD, 1337)).to.be.reverted;
+  });
+
+  it("Cannot approve someone's else token", async function() {
+    await erc721.mint(owner.address, 1337);
+    await expect(erc721Buffoon.approve(DEAD, 1337)).to.be.reverted;
+  });
+
+  it("Cannot transfer unowned token", async function() {
+    await expect(erc721.transferFrom(buffoon.address, DEAD, 1337)).to.be.reverted;
+  });
+
 });
