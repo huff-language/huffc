@@ -83,10 +83,11 @@
     // Update the balance of the recipient.
     // input stack: [value, from, to]
     dup3                // [to, value, from, to]
-	[BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00) // [balance, value, from, to]
-	dup2                // [value, balance, value, from, to]
-	add                 // [value+balance, value, from, to]
-	dup4                // [to, value+balance, value, from, to]
+    dup2                // [value, to, value, from, to]
+    swap1               // [to, value, value, from, to]
+    [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)  // [balance, value, value, from, to]
+    add                 // [balance+value, value, from, to]
+    dup4                // [to, balance+value, value, from, to]
     [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00) // [value, from, to]
 }
 
