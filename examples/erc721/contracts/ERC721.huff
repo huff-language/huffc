@@ -74,8 +74,7 @@
 #define macro GET_APPROVED() = takes (0) returns (0) {
     0x04 calldataload               // [tokenId]
     [SINGLE_APPROVAL_LOCATION]
-    LOAD_ELEMENT_FROM_KEYS(0x00)    // [address]
-    
+    LOAD_ELEMENT_FROM_KEYS(0x00)    // [spender]
     0x00 mstore
     0x20 0x00 return
 }
@@ -160,11 +159,13 @@
 
     // check if approved for all
     caller dup3                     // [owner, msg.sender, is_sender_owner, owner, tokenId]
-    LOAD_ELEMENT_FROM_KEYS(0x00)    // [is_approved_for_all, is_sender_owner, owner, tokenId]
-    or not error jumpi              // [owner, tokenId]
+    LOAD_ELEMENT_FROM_KEYS(0x00)    // [is_approved_for_all, is_sender_owner, owner, tokenId]]
+    or cont jumpi                   // [owner, tokenId]
+        error jump
+    cont:
 
     // store approval
-    0x04 calldataload dup1          // [spender, spender, owner, tokenId]
+    0x04 calldataload dup1 dup4     // [tokenId, spender, spender, owner, tokenId]
     [SINGLE_APPROVAL_LOCATION]
     STORE_ELEMENT_FROM_KEYS(0x00)   // [spender, owner, tokenId]
     swap1                           // [owner, spender, tokenId]
@@ -174,6 +175,7 @@
     0x00 0x00                                       // [0, 0, sig, owner, spender, tokenId]
     log4                                            // []
 
+    stop
     error:
         0x00 0x00 revert
 }
@@ -194,6 +196,7 @@
     0x00 0x00                                       // [0, 32, sig, owner, operator]
     log4                                            // []
 
+    stop
     error:
         0x00 0x00 revert
 }
@@ -270,7 +273,7 @@
     dup1 0xb88d4fde eq safeTransferFromWithData jumpi
     dup1 0x095ea7b3 eq approve jumpi
     dup1 0xa22cb465 eq setApprovalForAll jumpi
-    dup1 0xdd62ed3e eq getApproved jumpi
+    dup1 0x081812fc eq getApproved jumpi
     dup1 0x40c10f19 eq mint jumpi
     dup1 0x70a08231 eq balanceOf jumpi
     dup1 0x6352211e eq ownerOf jumpi
