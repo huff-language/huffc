@@ -100,6 +100,7 @@
 /* Transfer Functions */
 #define macro TRANSFER_TAKE_FROM(error) = takes(3) returns (3) {
     // input stack [from, to, tokenId]
+
     // check if it's owner
     dup1                                            // [from, from, to, tokenId]
     dup4                                            // [tokenId, from, from, to, tokenId]
@@ -109,24 +110,26 @@
     eq                                              // [from_is_owner, owner, from, to, tokenId]
     
     // check if approved for all
-    caller dup3                                     // [owner, msg.sender, from_is_owner, owner, from, to, tokenId]
+    caller dup4                                     // [from, msg.sender, from_is_owner, owner, from, to, tokenId]
     LOAD_ELEMENT_FROM_KEYS(0x00)                    // [is_approved_for_all, from_is_owner, owner, from, to, tokenId]
 
     // check if approved for tokenId
     dup6                                            // [tokenId, is_approved_for_all, from_is_owner, owner, from, to, tokenId]
     [SINGLE_APPROVAL_LOCATION]                      // [SINGLE_APPROVAL_LOCATION, tokenId, is_approved_for_all, from_is_owner, owner, from, to, tokenId]
-    LOAD_ELEMENT_FROM_KEYS(0x00)                    // [user_approved_for_tokenId, is_approved_for_all, from_is_owner, owner, from, to, tokenId]
+    LOAD_ELEMENT_FROM_KEYS(0x00)                    // [address_approved_for_tokenId, is_approved_for_all, from_is_owner, owner, from, to, tokenId]
     caller eq                                       // [caller_approved_for_tokenId, is_approved_for_all, from_is_owner, owner, from, to, tokenId]
-    or or not                                       // [is_not_authorized, owner, from, to, tokenId]
-    <error> jumpi                                   // [owner, from, to, tokenId]
+    or or cont jumpi                                // [owner, from, to, tokenId]
+        <error> jumpi                                   
+    cont:
 
     pop                                             // [from, to, tokenId]
 
-    // update balance
+    // update balance of from
     0x01 dup2                                       // [from, 1, from, to, tokenId]
     [BALANCE_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00) // [balance, 1, from, to, tokenId]
-    sub                                             // [balance-1, from, to, tokenId]
-    [BALANCE_LOCATION] STORE_ELEMENT_FROM_KEYS(0x00)  // [from, to, tokenId]
+    sub dup2                                        // [from, balance-1, from, to, tokenId]
+    [BALANCE_LOCATION]
+    STORE_ELEMENT_FROM_KEYS(0x00)                   // [from, to, tokenId]
 
 }
 
@@ -137,6 +140,7 @@
 	[BALANCE_LOCATION]
     LOAD_ELEMENT_FROM_KEYS(0x00)    // [balance, from, to, tokenId]
     0x01 add                        // [balance+1, from, to, tokenId]
+
     // update balance
 	dup3                            // [to, balance+1, from, to, tokenId]
     [BALANCE_LOCATION]
@@ -146,7 +150,12 @@
     dup2                            // [to, from, to, tokenId]
     dup4                            // [tokenId, to, from, to, tokenId]
     [OWNER_LOCATION]
-    STORE_ELEMENT_FROM_KEYS(0x00)     // [from, to, tokenId]
+    STORE_ELEMENT_FROM_KEYS(0x00)   // [from, to, tokenId]
+
+    // update approval
+    0x00 dup4                       // [tokenId, address(0), from, to, tokenId]
+    [SINGLE_APPROVAL_LOCATION]
+    STORE_ELEMENT_FROM_KEYS(0x00)   // [from, to, tokenId]
 }
 
 #define macro APPROVE() = takes (0) returns (0) {
@@ -215,10 +224,7 @@
     0x20 0x00                                       // [0, 0, sig, from, to, tokenId]
     log4                                            // []
 
-    // Return "1" to represent a succesful transfer.
-    0x01 0x00 mstore
-    0x20 0x00 return 
-
+    stop
     // Error destination.
     error:
         0x00 0x00 revert
