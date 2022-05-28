@@ -5,6 +5,9 @@ const { ethers } = require("hardhat");
 let erc721, owner, erc721Buffoon, buffoon;
 
 const DEAD = "0x000000000000000000000000000000000000dAeD";
+const BEEF = "0x000000000000000000000000000000000000bEEF";
+const CAFE = "0x000000000000000000000000000000000000cafE";
+const FEED = "0x000000000000000000000000000000000000FEeD";
 const ADDRESS0 = "0x0000000000000000000000000000000000000000";
 
 describe("ERC721", function () {
@@ -84,6 +87,11 @@ describe("ERC721", function () {
 
   it("Cannot transfer unowned token", async function() {
     await expect(erc721.transferFrom(buffoon.address, DEAD, 1337)).to.be.reverted;
+  });
+
+  it("Cannot transferFrom using wrong from", async function() {
+      await erc721.mint(CAFE, 1337);
+      await expect(erc721.transferFrom(FEED, BEEF, 1337)).to.be.reverted;
   });
 
 });
