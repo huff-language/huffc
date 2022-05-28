@@ -2,7 +2,7 @@
 
 ![Huff logo.](logo.png)
 
-Huff is a low-level programming language designed for developing highly optimized smart contracts that run on the ethereum virtual machine (EVM). Huff does not hide the inner workings of the EVM. Instead, Huff exposes its programming stack to the developer for manual manipulation.
+Huff is a low-level programming language designed for developing highly optimized smart contracts that run on the Ethereum Virtual Machine (EVM). Huff does not hide the inner workings of the EVM. Instead, Huff exposes its programming stack to the developer for manual manipulation.
 
 Rather than having functions, Huff has macros - individual blocks of bytecode that can be rigorously tested and evaluated using the Huff runtime testing suite.
 
