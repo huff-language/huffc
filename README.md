@@ -18,7 +18,7 @@ Make sure you have the following programs installed:
 
 - [NPM](https://www.npmjs.com/)
 - [Typescript](https://www.npmjs.com/package/typescript)
-- [Ts-code](https://www.npmjs.com/package/ts-node#overview)
+- [ts-node](https://www.npmjs.com/package/ts-node#overview)
 
 ### Steps
 
