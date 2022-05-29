@@ -48,6 +48,8 @@ export default {
   difficulty: "44",
   gaslimit: "45",
   chainid: "46",
+  selfbalance: "47",
+  basefee: "48",
   pop: "50",
   mload: "51",
   mstore: "52",
