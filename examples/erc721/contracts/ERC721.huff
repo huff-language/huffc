@@ -8,9 +8,6 @@
 /* Interface */
 #define function mint(address,uint256) nonpayable returns ()
 
-#define function name() nonpayable returns (string)
-#define function symbol() nonpayable returns (string)
-#define function tokenURI(uint256) nonpayable returns (string)
 
 #define function mint(address,uint256) nonpayable returns ()
 #define function transfer(address,uint256) nonpayable returns ()
@@ -22,6 +19,9 @@
 #define function isApprovedForAll(address,address) view returns (uint256)
 #define function ownerOf(uint256) view returns (address)
 #define function balanceOf(address) view returns (uint256)
+#define function name() view returns (string)
+#define function symbol() view returns (string)
+#define function tokenURI(uint256) view returns (string)
 
 #define event Transfer(address,address,uint256)
 #define event Approval(address,address,uint256)
@@ -44,6 +44,11 @@
 #define macro CONSTRUCTOR() = takes(0) returns (0) {
     // Set msg.sender as the owner of the contract.
     OWNABLE_CONSTRUCTOR()
+    // Name is first
+    0x20 0x40 codesize sub 0x00     // [mem_loc, codesize-size_of_name*2, size_of_name]
+    codecopy 0x00 mload             // [name]
+    [NAME_LOCATION] sstore          // []
+
 }
 
 /// >>>>>>>>>>>>>>>>>>>>>  VIEW FUNCTIONS  <<<<<<<<<<<<<<<<<<<<<< ///
@@ -80,7 +85,9 @@
 }
 
 #define macro NAME() = takes (0) returns (0) {
-    0x00 0x00 revert
+    [NAME_LOCATION] sload   // [name]
+    0x00 mstore
+    0x20 0x00 return
 }
 
 #define macro SYMBOL() = takes (0) returns (0) {

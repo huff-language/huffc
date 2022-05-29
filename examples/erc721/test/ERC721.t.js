@@ -10,6 +10,12 @@ const CAFE = "0x000000000000000000000000000000000000cafE";
 const FEED = "0x000000000000000000000000000000000000FEeD";
 const ADDRESS0 = "0x0000000000000000000000000000000000000000";
 
+function encodeShortString(arg) {
+    const encodedArg = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(arg));
+    const encodedLength = ethers.utils.hexZeroPad(ethers.utils.hexValue(encodedArg.length-2), 2).substr(2);
+    return encodedArg + "0".repeat(64 - encodedArg.length - 2) + encodedLength;
+}
+
 describe("ERC721", function () {
   before(async function () {
     [owner, buffoon] = await ethers.getSigners();
@@ -18,8 +24,12 @@ describe("ERC721", function () {
   });
 
   beforeEach(async function () {
+    const name = encodeShortString('Cool Huff Club');
+    const symbol = encodeShortString('CHC');
+    const constructorArgs = name.substr(2) + symbol.substr(2);
     const ERC721 = await ethers.getContractFactory("ERC721");
-    erc721 = await ERC721.deploy();
+    const NERC721 = new ethers.ContractFactory(ERC721.interface, ERC721.bytecode + constructorArgs, owner)
+    erc721 = await NERC721.deploy();
     await erc721.deployed();
 
     erc721Buffoon = await erc721.connect(buffoon);
@@ -27,6 +37,7 @@ describe("ERC721", function () {
 
   it("ERC721 is deployed", async function () {
     expect(erc721.address).to.not.equal("0x0000000000000000000000000000000000000000");
+    expect(await erc721.name()).to.equal("Cool Huff Club");
   });
 
   it("Can mint a NFT", async function () {
