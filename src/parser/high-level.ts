@@ -275,9 +275,10 @@ export const setStoragePointerConstants = (
         // Store the macro definition.
         const definition = body.match(MACRO_CODE.MACRO_CALL);
         const macroName = definition[1];
-
-        // Get the used storage pointer constants.
-        getUsedStoragePointerConstants(macroName, true);
+        if (macroName.startsWith("__")) {
+          // Get the used storage pointer constants.
+          getUsedStoragePointerConstants(macroName, true);
+        }
 
         // Slice the body.
         body = body.slice(definition[0].length);
