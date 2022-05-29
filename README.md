@@ -24,7 +24,7 @@ Make sure you have the following programs installed:
 
 This is how to create the contract bytecode to output _Hello, World!_ in Huff.
 
-1. Install Huff globally using NPM:
+1. Install Huff globally:
 
     ```shell
     yarn global add huffc
