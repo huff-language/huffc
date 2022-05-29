@@ -30,9 +30,7 @@ const parseMacro = (
     // Check if we're parsing a macro call.
     if (
       input.match(MACRO_CODE.MACRO_CALL) &&
-      !(input.match(MACRO_CODE.MACRO_CALL) ? input.match(MACRO_CODE.MACRO_CALL)[1] : "").startsWith(
-        "__"
-      )
+      !(input.match(MACRO_CODE.MACRO_CALL)![1] || "").startsWith("__")
     ) {
       // Parse the macro call.
       token = input.match(MACRO_CODE.MACRO_CALL);
@@ -93,7 +91,7 @@ const parseMacro = (
       if (!jumptables[name]) throw new Error(`Table ${name} is not defined`);
 
       // Get the size of the table.
-      const hex = formatEvenBytes(toHex(jumptables[name].value.length));
+      const hex = formatEvenBytes(toHex(jumptables[name].args[1]));
 
       // Add the table_size call to the token list.
       operations.push({ type: OperationType.PUSH, value: toHex(95 + hex.length / 2), args: [hex] });
