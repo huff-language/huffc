@@ -16,7 +16,7 @@ While EVM experts can use Huff to write highly-efficient smart contracts for use
 
 Make sure you have the following programs installed:
 
-- [NPM](https://www.npmjs.com/)
+- [yarn](https://yarnpkg.com/)
 - [Typescript](https://www.npmjs.com/package/typescript)
 - [ts-node](https://www.npmjs.com/package/ts-node#overview)
 
