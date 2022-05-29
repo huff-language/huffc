@@ -142,6 +142,4 @@ export default {
   shl: "1b",
   shr: "1c",
   sar: "1d",
-  rol: "1e",
-  ror: "1f",
 };
