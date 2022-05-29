@@ -27,8 +27,10 @@ This is how to create the contract bytecode to output _Hello, World!_ in Huff.
 1. Install Huff globally using NPM:
 
     ```shell
-    npm install -g huffc
+    yarn global add huffc
     ```
+
+**Note:** You may need to add yarn to your system's path to access globally installed packages. See [the yarn docs on global](https://classic.yarnpkg.com/en/docs/cli/global) for more details.
 
 1. Create a file called `hello-world.huff` and enter the following content:
 
@@ -39,7 +41,7 @@ This is how to create the contract bytecode to output _Hello, World!_ in Huff.
     }
     ```
 
-1. Use `huffc` to compile the contract and output bytecode:
+2. Use `huffc` to compile the contract and output bytecode:
 
     ```shell
     huffc hello-world.huff --bytecode
