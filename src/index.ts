@@ -1,7 +1,7 @@
+import { defaultAbiCoder } from "@ethersproject/abi";
 import { padNBytes, toHex } from "./utils/bytes";
 import { compileMacro } from "./compiler/compiler";
 import { parseFile, setStoragePointerConstants } from "./parser/high-level";
-import { ethers } from "ethers";
 import { generateAbi } from "./output";
 import { Sources } from "./parser/utils/contents";
 
@@ -73,8 +73,7 @@ function encodeArgs(args: { type: string; value: string }[]): string {
   });
 
   // Encode and array the types and values.
-  const abiCoder = new ethers.utils.AbiCoder();
-  return abiCoder.encode(types, values).replace(/^(0x)/, "");
+  return defaultAbiCoder.encode(types, values).replace(/^(0x)/, "");
 }
 
 // Export compiler function as default.
