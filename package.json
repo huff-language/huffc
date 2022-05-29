@@ -15,6 +15,7 @@
     "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@types/node": "^17.0.36",
     "chai": "^4.2.0",
     "eslint": "^5.15.3",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -47,7 +48,7 @@
     "build": "tsc",
     "lint": "eslint --ignore-path ./.eslintignore .",
     "test": "mocha ./src/ --bail --colors --exit --recursive --reporter spec --trace-warnings",
-    "exampletest": "mocha ./example/ --bail --colors --exit --recursive --reporter spec --trace-warnings"
+    "exampletest": "mocha ./examples/erc20 --bail --colors --exit --recursive --reporter spec --trace-warnings"
   },
   "bugs": {
     "url": "https://github.com/JetJadeja/huff/issues"
