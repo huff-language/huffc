@@ -6,5 +6,9 @@ import fs = require("fs");
  * @param filePath The path to the file
  */
 export const readFile = (filePath: string): string => {
-  return fs.readFileSync(path.posix.resolve(filePath), "utf8");
+  const resolvedPath = path.resolve(filePath);
+  if (!fs.existsSync(filePath)) {
+    throw Error(`File ${filePath} not found!`)
+  }
+  return fs.readFileSync(resolvedPath, "utf8");
 };

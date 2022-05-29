@@ -1,12 +1,14 @@
+import { defaultAbiCoder } from "@ethersproject/abi";
 import { padNBytes, toHex } from "./utils/bytes";
 import { compileMacro } from "./compiler/compiler";
 import { parseFile, setStoragePointerConstants } from "./parser/high-level";
-import { ethers } from "ethers";
 import { generateAbi } from "./output";
+import { Sources } from "./parser/utils/contents";
 
 /* Compilation Input Type */
 type HuffCompilerArgs = {
   filePath: string;
+  sources?: Sources;
   generateAbi: boolean;
   constructorArgs?: { type: string; value: string }[];
 };
@@ -19,7 +21,7 @@ type HuffCompilerArgs = {
  */
 const compile = (args: HuffCompilerArgs) => {
   // Parse the file and generate definitions.
-  const { macros, constants, tables, functions, events } = parseFile(args.filePath);
+  const { macros, constants, tables, functions, events } = parseFile(args.filePath, args.sources);
 
   // Generate the contract ABI.
   const abi = args.generateAbi ? generateAbi(functions, events) : "";
@@ -71,8 +73,7 @@ function encodeArgs(args: { type: string; value: string }[]): string {
   });
 
   // Encode and array the types and values.
-  const abiCoder = new ethers.utils.AbiCoder();
-  return abiCoder.encode(types, values).replace(/^(0x)/, "");
+  return defaultAbiCoder.encode(types, values).replace(/^(0x)/, "");
 }
 
 // Export compiler function as default.

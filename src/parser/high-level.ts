@@ -1,11 +1,9 @@
-import getAllFileContents from "./utils/contents";
+import getAllFileContents, { Sources } from "./utils/contents";
 
 import { isEndOfData } from "./utils/regex";
 import { Definitions } from "./utils/types";
 import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
 import { parseArgs, getLineNumber } from "./utils/parsing";
-
-import { solidityKeccak256, keccak256, arrayify } from "ethers/lib/utils";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
 import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils/bytes";
@@ -15,7 +13,8 @@ import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils
  * @param filePath The path to the file to parse.
  */
 export const parseFile = (
-  filePath: string
+  filePath: string,
+  sources?: Sources
 ): {
   macros: Definitions;
   constants: Definitions;
@@ -23,12 +22,8 @@ export const parseFile = (
   events: Definitions["data"];
   tables: Definitions;
 } => {
-  // Get an array of file contents.
-  const fileContents = getAllFileContents(filePath);
-
-  // Extract information.
-  const contents = fileContents.contents;
-  const imports = fileContents.imports;
+  // Get file fileContents and paths.
+  const {fileContents, filePaths} = getAllFileContents(filePath, sources);
 
   // Set defintion variables.
   const macros: Definitions = { data: {}, defintions: [] };
@@ -39,8 +34,8 @@ export const parseFile = (
   const functions: Definitions["data"] = {};
   const events: Definitions["data"] = {};
 
-  // Parse the file contents.
-  contents.forEach((content: string, contentIndex: number) => {
+  // Parse the file fileContents.
+  fileContents.forEach((content: string, contentIndex: number) => {
     let input = content;
 
     while (!isEndOfData(input)) {
@@ -75,7 +70,7 @@ export const parseFile = (
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name)
           throw new SyntaxError(
-            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
+            `ParserError at ${filePaths[contentIndex]} (Line ${getLineNumber(
               input,
               content
             )}): Constant ${name} must be uppercase.`
@@ -158,7 +153,7 @@ export const parseFile = (
         // Ensure the type is valid.
         if (type !== "jumptable__packed")
           throw new SyntaxError(
-            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
+            `ParserError at ${filePaths[contentIndex]} (Line ${getLineNumber(
               input,
               content
             )}): Table ${table[0]} has invalid type: ${type}`
@@ -189,7 +184,7 @@ export const parseFile = (
         // Ensure the type is valid.
         if (type !== "jumptable")
           throw new SyntaxError(
-            `ParserError at ${imports[contentIndex]} (Line ${getLineNumber(
+            `ParserError at ${filePaths[contentIndex]} (Line ${getLineNumber(
               input,
               content
             )}): Table ${table[0]} has invalid type: ${type}`
@@ -218,7 +213,7 @@ export const parseFile = (
 
         // Raise error.
         throw new SyntaxError(
-          `ParserError at ${imports[contentIndex]}(Line ${lineNumber}): Invalid Syntax
+          `ParserError at ${filePaths[contentIndex]}(Line ${lineNumber}): Invalid Syntax
           
           ${input.slice(0, input.indexOf("\n"))}
           ^

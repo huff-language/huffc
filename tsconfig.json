@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "suppressImplicitAnyIndexErrors": true,
     "noImplicitAny": false,
+    "esModuleInterop": true,
     "plugins": [
       {
         "name": "typescript-tslint-plugin",
