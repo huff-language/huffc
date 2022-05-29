@@ -3,10 +3,12 @@ import { compileMacro } from "./compiler/compiler";
 import { parseFile, setStoragePointerConstants } from "./parser/high-level";
 import { ethers } from "ethers";
 import { generateAbi } from "./output";
+import { Sources } from "./parser/utils/contents";
 
 /* Compilation Input Type */
 type HuffCompilerArgs = {
   filePath: string;
+  sources?: Sources;
   generateAbi: boolean;
   constructorArgs?: { type: string; value: string }[];
 };
@@ -19,7 +21,7 @@ type HuffCompilerArgs = {
  */
 const compile = (args: HuffCompilerArgs) => {
   // Parse the file and generate definitions.
-  const { macros, constants, tables, functions, events } = parseFile(args.filePath);
+  const { macros, constants, tables, functions, events } = parseFile(args.filePath, args.sources);
 
   // Generate the contract ABI.
   const abi = args.generateAbi ? generateAbi(functions, events) : "";
