@@ -49,6 +49,9 @@
     codecopy 0x00 mload             // [name]
     [NAME_LOCATION] sstore          // []
 
+    0x20 0x20 codesize sub 0x00     // [mem_loc, codesize-size_of_symbol, size_of_symbol]
+    codecopy 0x00 mload             // [symbol]
+    [SYMBOL_LOCATION] sstore        // []
 }
 
 /// >>>>>>>>>>>>>>>>>>>>>  VIEW FUNCTIONS  <<<<<<<<<<<<<<<<<<<<<< ///
@@ -85,13 +88,23 @@
 }
 
 #define macro NAME() = takes (0) returns (0) {
-    [NAME_LOCATION] sload   // [name]
-    0x00 mstore
-    0x20 0x00 return
+    0x20 0x00 mstore                // []
+    [NAME_LOCATION] sload           // [name]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, name]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
 }
 
 #define macro SYMBOL() = takes (0) returns (0) {
-    0x00 0x00 revert
+    0x20 0x00 mstore                // []
+    [SYMBOL_LOCATION] sload           // [symbol]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, symbol]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
 }
 
 #define macro TOKEN_URI() = takes (0) returns (0) {

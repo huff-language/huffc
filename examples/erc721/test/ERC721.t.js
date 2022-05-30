@@ -12,7 +12,7 @@ const ADDRESS0 = "0x0000000000000000000000000000000000000000";
 
 function encodeShortString(arg) {
     const encodedArg = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(arg));
-    const encodedLength = ethers.utils.hexZeroPad(ethers.utils.hexValue(encodedArg.length-2), 2).substr(2);
+    const encodedLength = ethers.utils.hexZeroPad(ethers.utils.hexValue((encodedArg.length-2)/2), 2).substr(2);
     return encodedArg + "0".repeat(64 - encodedArg.length - 2) + encodedLength;
 }
 
@@ -38,6 +38,7 @@ describe("ERC721", function () {
   it("ERC721 is deployed", async function () {
     expect(erc721.address).to.not.equal("0x0000000000000000000000000000000000000000");
     expect(await erc721.name()).to.equal("Cool Huff Club");
+    expect(await erc721.symbol()).to.equal("CHC");
   });
 
   it("Can mint a NFT", async function () {
