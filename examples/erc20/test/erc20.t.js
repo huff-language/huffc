@@ -2,54 +2,58 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 let token;
-let accounts;
-let owner;
-let user;
+let owner, bob, chad;
 let val;
+
+function encodeShortString(arg) {
+  const encodedArg = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(arg));
+  const encodedLength = ethers.utils.hexZeroPad(ethers.utils.hexValue((encodedArg.length-2)/2), 2).substr(2);
+  return encodedArg + "0".repeat(64 - encodedArg.length - 2) + encodedLength;
+}
 
 describe("ERC20", () => {
   beforeEach(async () => {
     val = 1e10;
-    accounts = await hre.ethers.getSigners();
+    [owner, bob, chad] = await ethers.getSigners();
 
-    owner = accounts[0].address;
-    user = accounts[1].address;
+    const name = encodeShortString('Huff Token');
+    const symbol = encodeShortString('HUFF');
+    const constructorArgs = name.substr(2) + symbol.substr(2);
 
-    const Token = await ethers.getContractFactory("ERC20");
-    token = await Token.deploy();
+    const ERC20 = await ethers.getContractFactory("ERC20");
+    const NERC20 = await new ethers.ContractFactory(ERC20.interface, ERC20.bytecode + constructorArgs, owner);
+    token = await NERC20.deploy();
     await token.deployed();
   });
 
-  it("Mint & Balance Check", async () => {
-    let bal = await token.balanceOf(user);
+  it("Metadata Check", async () => {
+    let name = await token.name();
+    let symbol = await token.symbol();
 
-    await token.mint(user, val);
-
-    bal = await token.balanceOf(user);
-
-    expect(bal).to.equal(val);
+    expect(name).to.equal("Huff Token");
+    expect(symbol).to.equal("HUFF");
   });
 
-  it("total supply TEST", async () => {
-    let initSupply = await token.totalSupply();
+  it("Mint & Balance Check", async () => {
+    // Chad cannot mint
+    await expect(token.connect(chad).mint(bob.address, val)).to.be.reverted;
+    // Owner can mint
+    let bal = await token.balanceOf(bob.address);
+    expect(bal).to.equal(0);
 
-    expect(initSupply).to.equal(0);
+    await token.mint(bob.address, val);
 
-    await token.mint(user, val);
-
-    let newSupply = await token.totalSupply();
-
-    expect(newSupply).to.equal(val);
+    expect(await token.balanceOf(bob.address)).to.equal(val);
   });
 
   it("allowance test", async () => {
-    let initAllowance = await token.allowance(owner, user);
+    let initAllowance = await token.allowance(owner.address, bob.address);
 
     expect(initAllowance).to.equal(0);
 
-    await token.approve(user, val);
+    await token.approve(bob.address, val);
 
-    let newAllowance = await token.allowance(owner, user);
+    let newAllowance = await token.allowance(owner.address, bob.address);
 
     expect(newAllowance).to.equal(val);
   });

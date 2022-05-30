@@ -12,6 +12,8 @@
 #define function transferFrom(address,address,uint256) nonpayable returns ()
 #define function approve(address,uint256) nonpayable returns ()
 
+#define function name() view returns (string)
+#define function symbol() view returns (string)
 #define function balanceOf(address) view returns (uint256)
 #define function allowance(address,address) view returns (uint256)
 #define function totalSupply() view returns (uint256)
@@ -24,6 +26,8 @@
 #define constant APPROVAL_EVENT_SIGNATURE = 0x8C5BE1E5EBEC7D5BD14F71427D1E84F3DD0314C0F7B2291E5B200AC8C7C3B925
 
 /* Storage Slots */
+#define constant NAME_LOCATION = FREE_STORAGE_POINTER()
+#define constant SYMBOL_LOCATION = FREE_STORAGE_POINTER()
 #define constant BALANCE_LOCATION = FREE_STORAGE_POINTER()
 #define constant ALLOWANCE_LOCATION = FREE_STORAGE_POINTER()
 #define constant TOTAL_SUPPLY_LOCATION = FREE_STORAGE_POINTER()
@@ -33,6 +37,35 @@
 #define macro CONSTRUCTOR() = takes(0) returns (0) {
     // Set msg.sender as the owner of the contract.
     OWNABLE_CONSTRUCTOR()
+    // Name is first
+    0x20 0x40 codesize sub 0x00     // [mem_loc, codesize-size_of_name*2, size_of_name]
+    codecopy 0x00 mload             // [name]
+    [NAME_LOCATION] sstore          // []
+
+    0x20 0x20 codesize sub 0x00     // [mem_loc, codesize-size_of_symbol, size_of_symbol]
+    codecopy 0x00 mload             // [symbol]
+    [SYMBOL_LOCATION] sstore        // []
+}
+
+/* Metadata Functions */
+#define macro NAME() = takes (0) returns (0) {
+    0x20 0x00 mstore                // []
+    [NAME_LOCATION] sload           // [name]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, name]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
+}
+
+#define macro SYMBOL() = takes (0) returns (0) {
+    0x20 0x00 mstore                // []
+    [SYMBOL_LOCATION] sload           // [symbol]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, symbol]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
 }
 
 /* Accounting Functions */
@@ -149,6 +182,7 @@
     [TRANSFER_EVENT_SIGNATURE]  // [sig, from, to]
     0x20 0x00                   // [0, 32, sig, from, to]
     log3                        // []
+
 }
 
 // Main Macro
@@ -161,6 +195,8 @@
     dup1 0x18160ddd eq totalSupply jumpi
     dup1 0x095ea7b3 eq approve jumpi
     dup1 0xdd62ed3e eq allowance jumpi
+    dup1 0x06fdde03 eq name jumpi
+    dup1 0x95d89b41 eq symbol jumpi
 
     transfer:
         TRANSFER()
@@ -174,5 +210,9 @@
         APPROVE()
     allowance:
         ALLOWANCE()
+    name:
+        NAME()
+    symbol:
+        SYMBOL()
 
 }
