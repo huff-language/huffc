@@ -19,7 +19,7 @@ npm run dev
 
 ### OpenSSL error
 
-If you get an OpenSSL error from NPM when running `npm run dev`, you may need to export a `NODE_OPTIONS` variable for this session.
+If you get an OpenSSL error from NPM when running `npm run dev`, you may need to export a `NODE_OPTIONS` variable for this session. More information on this error is available in the [webpack/webpack Github repo](https://github.com/webpack/webpack/issues/14532).
 
 1. If you see something like this:
 
