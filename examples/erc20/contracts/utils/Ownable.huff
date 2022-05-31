@@ -1,3 +1,7 @@
+/* Interface */
+#define function owner() view returns (address)
+#define function setOwner(address) nonpayable returns (uint256)
+
 /* Storage */
 #define constant OWNER_POINTER = FREE_STORAGE_POINTER()
 
@@ -6,17 +10,49 @@
     caller [OWNER_POINTER] sstore
 }
 
-/* Methods */
-#define macro OWNABLE_SET_OWNER() = takes (1) returns (0) {
-    [OWNER_POINTER] sstore
+/* Init */
+#define macro CONSTRUCTOR() = takes (0) returns (0) {
+    caller [OWNER_POINTER] sstore
 }
 
-#define macro OWNABLE_GET_OWNER() = takes (0) returns (1) {
-    [OWNER_POINTER] sload
-}
-
+//modifier to allow only owner
 #define macro ONLY_OWNER() = takes(0) returns(0) {
 	[OWNER_POINTER] sload caller eq is_owner jumpi
 		0x00 0x00 revert
 	is_owner:
+}
+
+/* Methods */
+#define macro OWNABLE_SET_OWNER() = takes (1) returns (0) {
+    ONLY_OWNER()
+    0x04 calldataload
+    dup1
+    0x0   
+
+    eq zero jumpi
+    [OWNER_POINTER] sstore
+    0x0 0x0 return
+    
+    zero:
+    0x0 0x0 revert
+}
+
+#define macro OWNABLE_GET_OWNER() = takes (0) returns (1) {
+    [OWNER_POINTER] sload
+    0x0 mstore
+    0x20 0x0 return
+}
+
+
+//controller to help navigate to functions 
+#define macro MAIN() = takes(0) returns(0){ 
+    0x0 calldataload 0xE0 shr   //extracting the function signature
+    dup1 0x13af4035 eq set_owner jumpi
+    dup1 0x8da5cb5b eq get_owner jumpi
+
+    set_owner:
+        OWNABLE_SET_OWNER()
+    
+    get_owner:
+        OWNABLE_GET_OWNER()
 }
