@@ -8,9 +8,6 @@
 /* Interface */
 #define function mint(address,uint256) nonpayable returns ()
 
-#define function name() nonpayable returns (string)
-#define function symbol() nonpayable returns (string)
-#define function tokenURI(uint256) nonpayable returns (string)
 
 #define function mint(address,uint256) nonpayable returns ()
 #define function transfer(address,uint256) nonpayable returns ()
@@ -22,6 +19,9 @@
 #define function isApprovedForAll(address,address) view returns (uint256)
 #define function ownerOf(uint256) view returns (address)
 #define function balanceOf(address) view returns (uint256)
+#define function name() view returns (string)
+#define function symbol() view returns (string)
+#define function tokenURI(uint256) view returns (string)
 
 #define event Transfer(address,address,uint256)
 #define event Approval(address,address,uint256)
@@ -44,6 +44,14 @@
 #define macro CONSTRUCTOR() = takes(0) returns (0) {
     // Set msg.sender as the owner of the contract.
     OWNABLE_CONSTRUCTOR()
+    // Name is first
+    0x20 0x40 codesize sub 0x00     // [mem_loc, codesize-size_of_name*2, size_of_name]
+    codecopy 0x00 mload             // [name]
+    [NAME_LOCATION] sstore          // []
+
+    0x20 0x20 codesize sub 0x00     // [mem_loc, codesize-size_of_symbol, size_of_symbol]
+    codecopy 0x00 mload             // [symbol]
+    [SYMBOL_LOCATION] sstore        // []
 }
 
 /// >>>>>>>>>>>>>>>>>>>>>  VIEW FUNCTIONS  <<<<<<<<<<<<<<<<<<<<<< ///
@@ -80,11 +88,23 @@
 }
 
 #define macro NAME() = takes (0) returns (0) {
-    0x00 0x00 revert
+    0x20 0x00 mstore                // []
+    [NAME_LOCATION] sload           // [name]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, name]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
 }
 
 #define macro SYMBOL() = takes (0) returns (0) {
-    0x00 0x00 revert
+    0x20 0x00 mstore                // []
+    [SYMBOL_LOCATION] sload           // [symbol]
+    // get size of string and store it in memory
+    dup1 0xffff and 0x20 mstore     // [length, symbol]
+    // potential issue ; will return original string with last 2 bytes holding length
+    0x40 mstore
+    0x60 0x00 return
 }
 
 #define macro TOKEN_URI() = takes (0) returns (0) {
