@@ -1,22 +1,14 @@
 const { expect } = require("chai");
+const { assert } = require("console");
 const { ethers, waffle } = require("hardhat");
 
-let accounts;
-let owner;
-let user;
-
 let ownable;
-//utils
+const [wallet, user] = waffle.provider.getWallets();
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 describe("OWNABLE", function () {
   beforeEach(async function () {
     const Ownable = await ethers.getContractFactory("Ownable");
-    accounts = await hre.ethers.getSigners();
-
-    owner = accounts[0].address;
-    user = accounts[1].address;
-
     ownable = await Ownable.deploy();
     await ownable.deployed();
   });
@@ -26,17 +18,21 @@ describe("OWNABLE", function () {
   });
 
   it("verify the owner", async function () {
-    const newOwner = await ownable.owner();
-    expect(newOwner).to.equal(owner);
+    const owner = await ownable.owner();
+    expect(owner).to.equal(wallet.address);
   });
 
   it("owner updated to a new owner", async function () {
-    await ownable.setOwner(user);
-    const newOwner = await ownable.owner();
-    expect(newOwner).to.equal(user);
+    await ownable.connect(wallet).setOwner(user.address);
+    const owner = await ownable.owner();
+    expect(owner).to.equal(user.address);
   });
 
   it("Revert on zero address", async function () {
     await expect(ownable.setOwner(ZERO_ADDRESS)).to.be.reverted;
+  });
+
+  it("Revert if someone other then owner tries to setOwner", async function () {
+    await expect(ownable.connect(user).setOwner(user.address)).to.be.reverted;
   });
 });
