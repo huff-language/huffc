@@ -167,7 +167,7 @@ export const parseArgument = (
   // If the input is a hex literal:
   if (isLiteral(input)) {
     // Get the bytes value of the operation.
-    const value = input.substring(2);
+    const value = formatEvenBytes(input.substring(2));
 
     // Get the push value
     const push = toHex(95 + value.length / 2);
