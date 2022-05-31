@@ -6,7 +6,7 @@ import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
 import { parseArgs, getLineNumber } from "./utils/parsing";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
-import { convertBytesToNumber, convertNumberToBytes, findLowest } from "../utils/bytes";
+import { convertBytesToNumber, convertNumberToBytes, findLowest, formatEvenBytes } from "../utils/bytes";
 
 /**
  * Parse a file, storing the definitions of all constants, macros, and tables.
@@ -65,7 +65,7 @@ export const parseFile = (
         // Parse constant definition.
         const constant = input.match(HIGH_LEVEL.CONSTANT);
         const name = constant[2];
-        const value = constant[3].replace("0x", "");
+        const value = formatEvenBytes(constant[3].replace("0x", ""));
 
         // Ensure that the constant name is all uppercase.
         if (name.toUpperCase() !== name)
