@@ -38,10 +38,8 @@ This is how to create the contract bytecode to output _Hello, World!_ in Huff.
 
 Also try with sudo as there may still be an issue with Yarn incorrectly using the Node.js installation directory as the executable directory, which is not writable by normal users:
 
-
-    ```
-    sudo yarn global add huffc
-    ```
+       sudo yarn global add huffc
+    
 
 ## Hello World
 
