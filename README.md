@@ -40,7 +40,7 @@ Also try with sudo as there may still be an issue with Yarn incorrectly using th
 
 
     ```shell
-   sudo yarn global add huffc
+    yarn global add huffc
     ```
 
 ## Hello World
