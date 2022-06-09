@@ -68,7 +68,7 @@ export const HIGH_LEVEL = {
      * which is then turned into the function signature.
      * For example "example(uint, bool)"
      */
-    "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_,\\s\\n]+)?\\)))",
+    "((?:[\\s\\n]*)([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_\\[\\],\\s\\n]+)?\\)))",
 
     /**
      * The function type (payable, nonpayable, view, pure).
@@ -83,7 +83,7 @@ export const HIGH_LEVEL = {
     /**
      * The return type of the function within parenthesis.
      */
-    "(?:\\(([a-zA-Z0-9_,\\s\\n[]]+)?\\))",
+    "(?:\\(([a-zA-Z0-9_\\[\\],\\s\\n]+)?\\))",
   ]),
 
   EVENT: combineRegexElements([

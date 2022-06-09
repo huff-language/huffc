@@ -62,8 +62,8 @@ const getNestedFileContents = (
   const normalizedImports = relativeImports.map(
     (relativeImport) => path.join(dir, relativeImport)
   );
-  const fileContents: string[] = [contents];
-  const filePaths: string[] = [filePath];
+  const fileContents: string[] = [];
+  const filePaths: string[] = [];
   imported[filePath] = true;
   for (const importPath of normalizedImports) {
     if (imported[importPath]) continue;
@@ -71,9 +71,11 @@ const getNestedFileContents = (
       fileContents: importContents,
       filePaths: importPaths
     } = getNestedFileContents(importPath, imported, getFile);
-    fileContents.unshift(...importContents);
-    filePaths.unshift(...importPaths);
+    fileContents.push(...importContents);
+    filePaths.push(...importPaths);
   }
+  fileContents.push(contents);
+  filePaths.push(filePath);
   return { fileContents, filePaths };
 }
 

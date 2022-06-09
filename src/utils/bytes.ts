@@ -34,7 +34,7 @@ export const removeNonMatching = (arr1: any[], arr2: any[]) => {
  * Format a hex literal to make its length even
  */
 export const formatEvenBytes = (bytes: string) => {
-  if (Math.floor(bytes.length / 2) * 2 !== bytes.length) {
+  if (bytes.length % 2) {
     return `0${bytes}`;
   }
   return bytes;
@@ -54,9 +54,5 @@ export const padNBytes = (hex: string, numBytes: number) => {
   if (hex.length > numBytes * 2) {
     throw new Error(`value ${hex} has more than ${numBytes} bytes!`);
   }
-  let result = hex;
-  while (result.length < numBytes * 2) {
-    result = `0${result}`;
-  }
-  return result;
+  return hex.padStart(numBytes * 2, '0');
 };

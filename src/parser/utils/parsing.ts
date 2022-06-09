@@ -68,7 +68,7 @@ export const parseArgs = (argString: string) => {
 export const throwErrors = (errors: string[]) => {
   if (errors.length > 0) {
     errors.map((error) => {
-      console.log(error);
+      process.stderr.write(`${error}\n`);
     });
 
     throw new Error("");

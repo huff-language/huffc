@@ -10,13 +10,17 @@ Initially developed by the Aztec Protocol team, Huff was created to write [Weier
 
 While EVM experts can use Huff to write highly-efficient smart contracts for use in production, it can also serve as a way for beginners to learn more about the EVM.
 
-## Example
+## Examples
+
+For usage examples, see the [huff-examples](https://github.com/huff-language/huff-examples) repository.
+
+## Installation
 
 ### Prerequisities
 
 Make sure you have the following programs installed:
 
-- [yarn](https://yarnpkg.com/)
+- [yarn](https://www.npmjs.com/package/yarn)
 - [Typescript](https://www.npmjs.com/package/typescript)
 - [ts-node](https://www.npmjs.com/package/ts-node#overview)
 
@@ -31,6 +35,8 @@ This is how to create the contract bytecode to output _Hello, World!_ in Huff.
     ```
 
 **Note:** You may need to add yarn to your system's path to access globally installed packages. See [the yarn docs on global](https://classic.yarnpkg.com/en/docs/cli/global) for more details.
+
+## Hello World
 
 1. Create a file called `hello-world.huff` and enter the following content:
 
