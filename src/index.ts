@@ -41,12 +41,50 @@ const compile = (args: HuffCompilerArgs) => {
   const contractLength = mainBytecode.length / 2;
   const constructorLength = constructorBytecode.length / 2;
 
-  // Convert the sizes and offset to bytes.
-  const contractSize = padNBytes(toHex(contractLength), 2);
-  const contractCodeOffset = padNBytes(toHex(13 + constructorLength), 2);
+  // Bootstrap code variables
+  let bootStrapCodeSize = 9;
+  let pushContractSizeCode: string;
+  let pushContractCodeOffset: string;
 
-  // push2(contract size) dup1 push2(offset to code) push1(0) codecopy push1(0) return
-  const bootstrapCode = `61${contractSize}8061${contractCodeOffset}6000396000f3`;
+  // Compute pushX(contract size)
+  if(contractLength < 256) {
+    // Convert the size and offset to bytes.
+    const contractSize = padNBytes(toHex(contractLength), 1);
+
+    // push1(contract size)
+    pushContractSizeCode = `60${contractSize}`
+  } else {
+    // Increment bootstrap code size
+    bootStrapCodeSize++;
+
+    // Convert the size and offset to bytes.
+    const contractSize = padNBytes(toHex(contractLength), 2);
+
+    // push2(contract size)
+    pushContractSizeCode = `61${contractSize}`
+  }
+
+  // Compute pushX(offset to code)
+  if((bootStrapCodeSize + constructorLength) < 256) {
+    // Convert the size and offset to bytes.
+    const contractCodeOffset = padNBytes(toHex(bootStrapCodeSize + constructorLength), 1);
+
+    // push1(offset to code)
+    pushContractCodeOffset = `60${contractCodeOffset}`
+  } else {
+    // Increment bootstrap code size
+    bootStrapCodeSize++;
+
+    // Convert the size and offset to bytes.
+    const contractCodeOffset = padNBytes(toHex(bootStrapCodeSize + constructorLength), 2);
+
+    // push2(offset to code)
+    pushContractCodeOffset = `61${contractCodeOffset}`
+  }
+
+
+  // pushX(contract size) dup1 pushX(offset to code) returndatsize codecopy returndatasize return
+  const bootstrapCode = `${pushContractSizeCode}80${pushContractCodeOffset}3d393df3`;
   const constructorCode = `${constructorBytecode}${bootstrapCode}`;
   const deployedBytecode = `${constructorCode}${mainBytecode}${
     args.constructorArgs ? encodeArgs(args.constructorArgs) : ""

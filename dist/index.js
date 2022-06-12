@@ -28,11 +28,42 @@ var compile = function (args) {
     // Store the sizes of the bytecode.
     var contractLength = mainBytecode.length / 2;
     var constructorLength = constructorBytecode.length / 2;
-    // Convert the sizes and offset to bytes.
-    var contractSize = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(contractLength), 2);
-    var contractCodeOffset = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(13 + constructorLength), 2);
-    // push2(contract size) dup1 push2(offset to code) push1(0) codecopy push1(0) return
-    var bootstrapCode = "61".concat(contractSize, "8061").concat(contractCodeOffset, "6000396000f3");
+    // Bootstrap code variables
+    var bootStrapCodeSize = 9;
+    var pushContractSizeCode;
+    var pushContractCodeOffset;
+    // Compute pushX(contract size)
+    if (contractLength < 256) {
+        // Convert the size and offset to bytes.
+        var contractSize = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(contractLength), 1);
+        // push1(contract size)
+        pushContractSizeCode = "60".concat(contractSize);
+    }
+    else {
+        // Increment bootstrap code size
+        bootStrapCodeSize++;
+        // Convert the size and offset to bytes.
+        var contractSize = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(contractLength), 2);
+        // push2(contract size)
+        pushContractSizeCode = "61".concat(contractSize);
+    }
+    // Compute pushX(offset to code)
+    if ((bootStrapCodeSize + constructorLength) < 256) {
+        // Convert the size and offset to bytes.
+        var contractCodeOffset = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(bootStrapCodeSize + constructorLength), 1);
+        // push1(offset to code)
+        pushContractCodeOffset = "60".concat(contractCodeOffset);
+    }
+    else {
+        // Increment bootstrap code size
+        bootStrapCodeSize++;
+        // Convert the size and offset to bytes.
+        var contractCodeOffset = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(bootStrapCodeSize + constructorLength), 2);
+        // push2(offset to code)
+        pushContractCodeOffset = "61".concat(contractCodeOffset);
+    }
+    // pushX(contract size) dup1 pushX(offset to code) returndatsize codecopy returndatasize return
+    var bootstrapCode = "".concat(pushContractSizeCode, "80").concat(pushContractCodeOffset, "3d393df3");
     var constructorCode = "".concat(constructorBytecode).concat(bootstrapCode);
     var deployedBytecode = "".concat(constructorCode).concat(mainBytecode).concat(args.constructorArgs ? encodeArgs(args.constructorArgs) : "");
     // Return the bytecode.
