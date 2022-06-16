@@ -266,5 +266,3 @@ export const MACRO_CODE = {
   /* Syntax for jumptables */
   JUMP_LABEL: combineRegexElements(["^(?:[\\s\\n]*)([a-zA-Z0-9_\\-]+):\\s*\\n*"]),
 };
-
-console.log(HIGH_LEVEL.FUNCTION);
