@@ -47,12 +47,12 @@ const compile = (args: HuffCompilerArgs) => {
   let pushContractCodeOffset: string;
 
   // Compute pushX(contract size)
-  if(contractLength < 256) {
+  if (contractLength < 256) {
     // Convert the size and offset to bytes.
     const contractSize = padNBytes(toHex(contractLength), 1);
 
     // push1(contract size)
-    pushContractSizeCode = `60${contractSize}`
+    pushContractSizeCode = `60${contractSize}`;
   } else {
     // Increment bootstrap code size
     bootStrapCodeSize++;
@@ -61,16 +61,16 @@ const compile = (args: HuffCompilerArgs) => {
     const contractSize = padNBytes(toHex(contractLength), 2);
 
     // push2(contract size)
-    pushContractSizeCode = `61${contractSize}`
+    pushContractSizeCode = `61${contractSize}`;
   }
 
   // Compute pushX(offset to code)
-  if((bootStrapCodeSize + constructorLength) < 256) {
+  if (bootStrapCodeSize + constructorLength < 256) {
     // Convert the size and offset to bytes.
     const contractCodeOffset = padNBytes(toHex(bootStrapCodeSize + constructorLength), 1);
 
     // push1(offset to code)
-    pushContractCodeOffset = `60${contractCodeOffset}`
+    pushContractCodeOffset = `60${contractCodeOffset}`;
   } else {
     // Increment bootstrap code size
     bootStrapCodeSize++;
@@ -79,9 +79,8 @@ const compile = (args: HuffCompilerArgs) => {
     const contractCodeOffset = padNBytes(toHex(bootStrapCodeSize + constructorLength), 2);
 
     // push2(offset to code)
-    pushContractCodeOffset = `61${contractCodeOffset}`
+    pushContractCodeOffset = `61${contractCodeOffset}`;
   }
-
 
   // pushX(contract size) dup1 pushX(offset to code) returndatsize codecopy returndatasize return
   const bootstrapCode = `${pushContractSizeCode}80${pushContractCodeOffset}3d393df3`;
@@ -89,6 +88,8 @@ const compile = (args: HuffCompilerArgs) => {
   const deployedBytecode = `${constructorCode}${mainBytecode}${
     args.constructorArgs ? encodeArgs(args.constructorArgs) : ""
   }`;
+
+  console.log(deployedBytecode);
 
   // Return the bytecode.
   return { bytecode: deployedBytecode, runtimeBytecode: mainBytecode, abi: abi };
