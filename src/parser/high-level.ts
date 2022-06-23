@@ -16,7 +16,7 @@ import { HuffCompilerArgs } from "../types";
 
 /**
  * Parse a file or just the content, storing the definitions of all constants, macros, and tables.
- * @param filePath The path to the file to parse.
+ * @param args file or data info.
  */
 export const parse = (
   args: HuffCompilerArgs

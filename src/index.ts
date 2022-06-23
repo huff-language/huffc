@@ -6,9 +6,8 @@ import { generateAbi } from "./output";
 import { HuffCompilerArgs } from "./types";
 
 /**
- * Compile a Huff file.
- * @param filePath The path to the file.
- * @param args An array containing the arguments to the macro.
+ * Compile a Huff file/data.
+ * @param args file or data info.
  * @returns The compiled bytecode.
  */
 const compile = (args: HuffCompilerArgs) => {
