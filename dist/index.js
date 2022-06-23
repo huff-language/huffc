@@ -1,9 +1,9 @@
 "use strict";
 exports.__esModule = true;
+var abi_1 = require("@ethersproject/abi");
 var bytes_1 = require("./utils/bytes");
 var compiler_1 = require("./compiler/compiler");
 var high_level_1 = require("./parser/high-level");
-var ethers_1 = require("ethers");
 var output_1 = require("./output");
 /**
  * Compile a Huff file.
@@ -13,7 +13,7 @@ var output_1 = require("./output");
  */
 var compile = function (args) {
     // Parse the file and generate definitions.
-    var _a = (0, high_level_1.parseFile)(args.filePath), macros = _a.macros, constants = _a.constants, tables = _a.tables, functions = _a.functions, events = _a.events;
+    var _a = (0, high_level_1.parse)(args), macros = _a.macros, constants = _a.constants, tables = _a.tables, functions = _a.functions, events = _a.events;
     // Generate the contract ABI.
     var abi = args.generateAbi ? (0, output_1.generateAbi)(functions, events) : "";
     // Set storage pointer constants.
@@ -48,7 +48,7 @@ var compile = function (args) {
         pushContractSizeCode = "61".concat(contractSize);
     }
     // Compute pushX(offset to code)
-    if ((bootStrapCodeSize + constructorLength) < 256) {
+    if (bootStrapCodeSize + constructorLength < 256) {
         // Convert the size and offset to bytes.
         var contractCodeOffset = (0, bytes_1.padNBytes)((0, bytes_1.toHex)(bootStrapCodeSize + constructorLength), 1);
         // push1(offset to code)
@@ -66,6 +66,7 @@ var compile = function (args) {
     var bootstrapCode = "".concat(pushContractSizeCode, "80").concat(pushContractCodeOffset, "3d393df3");
     var constructorCode = "".concat(constructorBytecode).concat(bootstrapCode);
     var deployedBytecode = "".concat(constructorCode).concat(mainBytecode).concat(args.constructorArgs ? encodeArgs(args.constructorArgs) : "");
+    console.log(deployedBytecode);
     // Return the bytecode.
     return { bytecode: deployedBytecode, runtimeBytecode: mainBytecode, abi: abi };
 };
@@ -84,8 +85,7 @@ function encodeArgs(args) {
         values.push(arg.value);
     });
     // Encode and array the types and values.
-    var abiCoder = new ethers_1.ethers.utils.AbiCoder();
-    return abiCoder.encode(types, values).replace(/^(0x)/, "");
+    return abi_1.defaultAbiCoder.encode(types, values).replace(/^(0x)/, "");
 }
 // Export compiler function as default.
 exports["default"] = compile;
