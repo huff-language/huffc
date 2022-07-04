@@ -1,12 +1,11 @@
-# The Huff Programming Language
-
 ---
-## 📌 **Deprecation Notice**
+📌 **Deprecation Notice**
 
 This repository is deprecated and no more work will be done on it. You can continue to use this and it should work as-is but any future issues will not be fixed by the community. 
 
 We have transitioned to developing [huff-rs](https://github.com/huff-language/huff-rs).
 ---
+# The Huff Programming Language
 
 ![Huff logo.](logo.png)
 
