@@ -6,6 +6,8 @@ This repository is considered deprecated and will be archived. For the new versi
 
 You can continue to use this and it should work as-is but any future issues will not be fixed by the community.
 
+-------
+
 ![Huff logo.](logo.png)
 
 Huff is a low-level programming language designed for developing highly optimized smart contracts that run on the Ethereum Virtual Machine (EVM). Huff does not hide the inner workings of the EVM. Instead, Huff exposes its programming stack to the developer for manual manipulation.
