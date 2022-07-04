@@ -1,6 +1,6 @@
 # The Huff Programming Language
 
-## DEPRECATION WARNING
+## 📌 DEPRECATION WARNING
 
 This repository is considered deprecated and will be archived. For the new version of this tool please go to [huff-rs](https://github.com/huff-language/huff-rs). 
 
