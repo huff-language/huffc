@@ -66,7 +66,7 @@ exports.parseArgs = parseArgs;
 var throwErrors = function (errors) {
     if (errors.length > 0) {
         errors.map(function (error) {
-            console.log(error);
+            process.stderr.write("".concat(error, "\n"));
         });
         throw new Error("");
     }

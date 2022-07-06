@@ -19,9 +19,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.processMacro = void 0;
-var opcodes_1 = require("../evm/opcodes");
+var opcodes_1 = __importDefault(require("../evm/opcodes"));
 var macros_1 = require("../parser/macros");
 var types_1 = require("../parser/utils/types");
 var bytes_1 = require("../utils/bytes");

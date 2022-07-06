@@ -2,6 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
     "suppressImplicitAnyIndexErrors": true,
     "noImplicitAny": false,
     "esModuleInterop": true,

@@ -8,6 +8,10 @@ var fs = require("fs");
  * @param filePath The path to the file
  */
 var readFile = function (filePath) {
-    return fs.readFileSync(path.posix.resolve(filePath), "utf8");
+    var resolvedPath = path.resolve(filePath);
+    if (!fs.existsSync(filePath)) {
+        throw Error("File ".concat(filePath, " not found!"));
+    }
+    return fs.readFileSync(resolvedPath, "utf8");
 };
 exports.readFile = readFile;

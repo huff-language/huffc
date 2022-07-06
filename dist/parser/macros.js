@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.parseArgument = void 0;
-var opcodes_1 = require("../evm/opcodes");
+var opcodes_1 = __importDefault(require("../evm/opcodes"));
 var bytes_1 = require("../utils/bytes");
 var defintions_1 = require("./syntax/defintions");
 var parsing_1 = require("./utils/parsing");
@@ -23,7 +26,7 @@ var parseMacro = function (macro, macros, constants, jumptables) {
         var token = void 0;
         // Check if we're parsing a macro call.
         if (input.match(defintions_1.MACRO_CODE.MACRO_CALL) &&
-            !(input.match(defintions_1.MACRO_CODE.MACRO_CALL) ? input.match(defintions_1.MACRO_CODE.MACRO_CALL)[1] : "").startsWith("__")) {
+            !(input.match(defintions_1.MACRO_CODE.MACRO_CALL)[1] || "").startsWith("__")) {
             // Parse the macro call.
             token = input.match(defintions_1.MACRO_CODE.MACRO_CALL);
             var name_1 = token[1];
@@ -74,7 +77,7 @@ var parseMacro = function (macro, macros, constants, jumptables) {
             if (!jumptables[name_4])
                 throw new Error("Table ".concat(name_4, " is not defined"));
             // Get the size of the table.
-            var hex = (0, bytes_1.formatEvenBytes)((0, bytes_1.toHex)(jumptables[name_4].value.length));
+            var hex = (0, bytes_1.formatEvenBytes)((0, bytes_1.toHex)(jumptables[name_4].args[1]));
             // Add the table_size call to the token list.
             operations.push({ type: types_1.OperationType.PUSH, value: (0, bytes_1.toHex)(95 + hex.length / 2), args: [hex] });
         }
@@ -133,7 +136,7 @@ var parseArgument = function (input, macros, constants) {
     // If the input is a hex literal:
     if ((0, regex_1.isLiteral)(input)) {
         // Get the bytes value of the operation.
-        var value = input.substring(2);
+        var value = (0, bytes_1.formatEvenBytes)(input.substring(2));
         // Get the push value
         var push = (0, bytes_1.toHex)(95 + value.length / 2);
         // Return a macro map with a single macro containing a push operation.

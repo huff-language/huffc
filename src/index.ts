@@ -1,27 +1,18 @@
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { padNBytes, toHex } from "./utils/bytes";
 import { compileMacro } from "./compiler/compiler";
-import { parseFile, setStoragePointerConstants } from "./parser/high-level";
+import { parse, setStoragePointerConstants } from "./parser/high-level";
 import { generateAbi } from "./output";
-import { Sources } from "./parser/utils/contents";
-
-/* Compilation Input Type */
-type HuffCompilerArgs = {
-  filePath: string;
-  sources?: Sources;
-  generateAbi: boolean;
-  constructorArgs?: { type: string; value: string }[];
-};
+import { HuffCompilerArgs } from "./types";
 
 /**
- * Compile a Huff file.
- * @param filePath The path to the file.
- * @param args An array containing the arguments to the macro.
+ * Compile a Huff file/data.
+ * @param args file or data info.
  * @returns The compiled bytecode.
  */
 const compile = (args: HuffCompilerArgs) => {
   // Parse the file and generate definitions.
-  const { macros, constants, tables, functions, events } = parseFile(args.filePath, args.sources);
+  const { macros, constants, tables, functions, events } = parse(args);
 
   // Generate the contract ABI.
   const abi = args.generateAbi ? generateAbi(functions, events) : "";

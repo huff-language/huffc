@@ -1,23 +1,25 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
-exports.setStoragePointers = exports.setStoragePointerConstants = exports.parseFile = void 0;
-var contents_1 = require("./utils/contents");
+exports.setStoragePointers = exports.setStoragePointerConstants = exports.parse = void 0;
+var contents_1 = __importDefault(require("./utils/contents"));
 var regex_1 = require("./utils/regex");
 var defintions_1 = require("./syntax/defintions");
 var parsing_1 = require("./utils/parsing");
 var tables_1 = require("./tables");
-var macros_1 = require("./macros");
+var macros_1 = __importDefault(require("./macros"));
 var bytes_1 = require("../utils/bytes");
 /**
- * Parse a file, storing the definitions of all constants, macros, and tables.
+ * Parse a file or just the content, storing the definitions of all constants, macros, and tables.
  * @param filePath The path to the file to parse.
  */
-var parseFile = function (filePath) {
-    // Get an array of file contents.
-    var fileContents = (0, contents_1["default"])(filePath);
-    // Extract information.
-    var contents = fileContents.contents;
-    var imports = fileContents.imports;
+var parse = function (args) {
+    // Get file fileContents and paths.
+    var _a = args.kind == "file"
+        ? (0, contents_1["default"])(args.filePath, args.sources)
+        : { fileContents: [(0, parsing_1.removeComments)(args.content)], filePaths: [""] }, fileContents = _a.fileContents, filePaths = _a.filePaths;
     // Set defintion variables.
     var macros = { data: {}, defintions: [] };
     var constants = { data: {}, defintions: [] };
@@ -25,8 +27,8 @@ var parseFile = function (filePath) {
     // Set output variables.
     var functions = {};
     var events = {};
-    // Parse the file contents.
-    contents.forEach(function (content, contentIndex) {
+    // Parse the file fileContents.
+    fileContents.forEach(function (content, contentIndex) {
         var input = content;
         while (!(0, regex_1.isEndOfData)(input)) {
             // Check if we are parsing a macro definition.
@@ -51,10 +53,10 @@ var parseFile = function (filePath) {
                 // Parse constant definition.
                 var constant = input.match(defintions_1.HIGH_LEVEL.CONSTANT);
                 var name_1 = constant[2];
-                var value = constant[3].replace("0x", "");
+                var value = (0, bytes_1.formatEvenBytes)(constant[3].replace("0x", ""));
                 // Ensure that the constant name is all uppercase.
                 if (name_1.toUpperCase() !== name_1)
-                    throw new SyntaxError("ParserError at ".concat(imports[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Constant ").concat(name_1, " must be uppercase."));
+                    throw new SyntaxError("ParserError at ".concat(filePaths[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Constant ").concat(name_1, " must be uppercase."));
                 // Store the constant.
                 constants.defintions.push(name_1);
                 constants.data[name_1] = { value: value, args: [] };
@@ -90,9 +92,9 @@ var parseFile = function (filePath) {
                 // This is the signature of the event.
                 var name_3 = eventDef[2];
                 // Store the args.
-                var args = (0, parsing_1.parseArgs)(eventDef[3]).map(function (arg) { return arg.replace("indexed", " indexed"); });
+                var args_1 = (0, parsing_1.parseArgs)(eventDef[3]).map(function (arg) { return arg.replace("indexed", " indexed"); });
                 // Store the event definition.
-                events[name_3] = { value: name_3, args: args };
+                events[name_3] = { value: name_3, args: args_1 };
                 // Slice the input.
                 input = input.slice(eventDef[0].length);
             }
@@ -116,7 +118,7 @@ var parseFile = function (filePath) {
                 var type = table[1];
                 // Ensure the type is valid.
                 if (type !== "jumptable__packed")
-                    throw new SyntaxError("ParserError at ".concat(imports[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Table ").concat(table[0], " has invalid type: ").concat(type));
+                    throw new SyntaxError("ParserError at ".concat(filePaths[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Table ").concat(table[0], " has invalid type: ").concat(type));
                 // Parse the table.
                 var body = table[3];
                 var parsed = (0, tables_1.parseJumpTable)(body, true);
@@ -137,7 +139,7 @@ var parseFile = function (filePath) {
                 var type = table[1];
                 // Ensure the type is valid.
                 if (type !== "jumptable")
-                    throw new SyntaxError("ParserError at ".concat(imports[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Table ").concat(table[0], " has invalid type: ").concat(type));
+                    throw new SyntaxError("ParserError at ".concat(filePaths[contentIndex], " (Line ").concat((0, parsing_1.getLineNumber)(input, content), "): Table ").concat(table[0], " has invalid type: ").concat(type));
                 // Parse the table.
                 var body = table[3];
                 var parsed = (0, tables_1.parseJumpTable)(body, false);
@@ -157,14 +159,14 @@ var parseFile = function (filePath) {
                 // Get the line number of the file.
                 var lineNumber = content.substring(0, index).split("\n").length;
                 // Raise error.
-                throw new SyntaxError("ParserError at ".concat(imports[contentIndex], "(Line ").concat(lineNumber, "): Invalid Syntax\n          \n          ").concat(input.slice(0, input.indexOf("\n")), "\n          ^\n          "));
+                throw new SyntaxError("ParserError at ".concat(filePaths[contentIndex], "(Line ").concat(lineNumber, "): Invalid Syntax\n          \n          ").concat(input.slice(0, input.indexOf("\n")), "\n          ^\n          "));
             }
         }
     });
     // Return all values
     return { macros: macros, constants: constants, functions: functions, events: events, tables: tables };
 };
-exports.parseFile = parseFile;
+exports.parse = parse;
 var setStoragePointerConstants = function (macrosToSearch, macros, constants) {
     // Array of used storage pointer constants.
     var usedStoragePointerConstants = [];
@@ -201,8 +203,10 @@ var setStoragePointerConstants = function (macrosToSearch, macros, constants) {
                 // Store the macro definition.
                 var definition = body.match(defintions_1.MACRO_CODE.MACRO_CALL);
                 var macroName = definition[1];
-                // Get the used storage pointer constants.
-                getUsedStoragePointerConstants(macroName, true);
+                if (!macroName.startsWith("__")) {
+                    // Get the used storage pointer constants.
+                    getUsedStoragePointerConstants(macroName, true);
+                }
                 // Slice the body.
                 body = body.slice(definition[0].length);
             }

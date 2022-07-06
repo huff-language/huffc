@@ -1,20 +1,25 @@
-import getAllFileContents, { Sources } from "./utils/contents";
+import getAllFileContents from "./utils/contents";
 
 import { isEndOfData } from "./utils/regex";
 import { Definitions } from "./utils/types";
 import { HIGH_LEVEL, MACRO_CODE } from "./syntax/defintions";
-import { parseArgs, getLineNumber } from "./utils/parsing";
+import { parseArgs, getLineNumber, removeComments } from "./utils/parsing";
 import { parseCodeTable, parseJumpTable } from "./tables";
 import parseMacro from "./macros";
-import { convertBytesToNumber, convertNumberToBytes, findLowest, formatEvenBytes } from "../utils/bytes";
+import {
+  convertBytesToNumber,
+  convertNumberToBytes,
+  findLowest,
+  formatEvenBytes,
+} from "../utils/bytes";
+import { HuffCompilerArgs } from "../types";
 
 /**
- * Parse a file, storing the definitions of all constants, macros, and tables.
- * @param filePath The path to the file to parse.
+ * Parse a file or just the content, storing the definitions of all constants, macros, and tables.
+ * @param args file or data info.
  */
-export const parseFile = (
-  filePath: string,
-  sources?: Sources
+export const parse = (
+  args: HuffCompilerArgs
 ): {
   macros: Definitions;
   constants: Definitions;
@@ -23,7 +28,10 @@ export const parseFile = (
   tables: Definitions;
 } => {
   // Get file fileContents and paths.
-  const {fileContents, filePaths} = getAllFileContents(filePath, sources);
+  const { fileContents, filePaths } =
+    args.kind == "file"
+      ? getAllFileContents(args.filePath, args.sources)
+      : { fileContents: [removeComments(args.content)], filePaths: [""] };
 
   // Set defintion variables.
   const macros: Definitions = { data: {}, defintions: [] };

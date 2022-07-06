@@ -36,7 +36,7 @@ exports.removeNonMatching = removeNonMatching;
  * Format a hex literal to make its length even
  */
 var formatEvenBytes = function (bytes) {
-    if (Math.floor(bytes.length / 2) * 2 !== bytes.length) {
+    if (bytes.length % 2) {
         return "0".concat(bytes);
     }
     return bytes;
@@ -56,10 +56,6 @@ var padNBytes = function (hex, numBytes) {
     if (hex.length > numBytes * 2) {
         throw new Error("value ".concat(hex, " has more than ").concat(numBytes, " bytes!"));
     }
-    var result = hex;
-    while (result.length < numBytes * 2) {
-        result = "0".concat(result);
-    }
-    return result;
+    return hex.padStart(numBytes * 2, '0');
 };
 exports.padNBytes = padNBytes;

@@ -3,7 +3,7 @@ import compile from "./";
 import fs = require("fs");
 
 // Compiler Version
-const version = "2.0.0";
+const version = "2.1.0";
 
 // Define terminal commands.
 program.name("huffc");
@@ -22,7 +22,7 @@ program.parse(process.argv);
 const options = program.opts();
 
 var files = program.args;
-var destination = options.outputDir || ".";
+var destination = options.outputDirectory || ".";
 
 // Abort the program.
 const abort = (msg) => {
@@ -37,12 +37,13 @@ files.forEach((file) => {
 
   // Compile the file.
   const result = compile({
+    kind: "file",
     filePath: file,
     generateAbi: true,
   });
 
   // If the user has specified an output file, write the output to the file.
-  const outputPath = `${options.outputDirectory}${files[0].replace(".huff", ".json")}`;
+  const outputPath = `${destination}${files[0].replace(".huff", ".json")}`;
   if (options.output) fs.writeFileSync(outputPath, result.abi);
 
   // If the user has specified for us to log the bytecode, log it.
